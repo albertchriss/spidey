@@ -1,13 +1,10 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import {
-  getServerSession,
+import NextAuth, {
   type DefaultSession,
-  type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
+import authConfig from "./auth.config"
 
-import { env } from "~/env";
 import { db } from "~/server/db";
 import {
   accounts,
@@ -15,6 +12,8 @@ import {
   users,
   verificationTokens,
 } from "~/server/db/schema";
+
+import { api } from "~/trpc/server"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -37,20 +36,25 @@ declare module "next-auth" {
   // }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
-export const authOptions: NextAuthOptions = {
+export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async session({token, session}){
+      if (token.sub && session.user){
+        session.user.id = token.sub
+      }
+      return session;
+    },
+
+    // async jwt ({ token }){
+    //   if (!token.sub) return token;
+
+    //   const existingUser = await api.user.getUserById(token.sub);
+
+    //   if (!existingUser) return token;
+
+    //   return token;
+
+    // }
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -58,26 +62,9 @@ export const authOptions: NextAuthOptions = {
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }) as Adapter,
-  providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
-  ],
-};
-
-/**
- * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
- *
- * @see https://next-auth.js.org/configuration/nextjs
- */
-export const getServerAuthSession = () => getServerSession(authOptions);
+  session:{
+    strategy : "jwt",
+  },
+  ...authConfig
+  
+});

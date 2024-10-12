@@ -1,0 +1,7 @@
+npm install next-auth@beta
+
+npx shadcn@latest init
+
+npx shadcn@latest add button
+
+npm i @neondatabase/serverless
