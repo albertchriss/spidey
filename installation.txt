@@ -5,3 +5,5 @@ npx shadcn@latest init
 npx shadcn@latest add button
 
 npm i @neondatabase/serverless
+
+npm install react-icons --save

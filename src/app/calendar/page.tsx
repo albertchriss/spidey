@@ -5,7 +5,7 @@ import { SignOutButton } from '../_components/SignOutButton';
 const CalendarPage = async () => {
     const session = await auth();
   return (
-    <div>
+    <div className='flex flex-col items-center min-h-screen font-inter my-2'>
         <p>
             { JSON.stringify(session)} 
         </p>
