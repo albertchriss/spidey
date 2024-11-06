@@ -4,7 +4,7 @@ import { SignOutButton } from '~/app/_components/SignOutButton'
 import { TaskTable } from '~/app/_components/TaskTable';
 import { OptionBar } from '~/app/_components/OptionBar';
 
-const CalendarPage = () => {
+const TaskListPage = () => {
   const [showOptionBar, setShowOptionBar] = useState(false);
   const onSelect = (isOn: boolean) => {
     if (isOn){
@@ -30,4 +30,4 @@ const CalendarPage = () => {
   )
 }
 
-export default CalendarPage
+export default TaskListPage
