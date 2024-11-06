@@ -21,9 +21,6 @@ export default async function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          {
-            session ? <Navbar /> : null
-          }
           {children}
         </TRPCReactProvider>
       </body>

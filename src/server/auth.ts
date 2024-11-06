@@ -3,7 +3,8 @@ import NextAuth, {
   type DefaultSession,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import authConfig from "./auth.config"
+import Google from "next-auth/providers/google"
+import { env } from "~/env"
 
 import { db } from "~/server/db";
 import {
@@ -44,17 +45,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return session;
     },
-
-    // async jwt ({ token }){
-    //   if (!token.sub) return token;
-
-    //   const existingUser = await api.user.getUserById(token.sub);
-
-    //   if (!existingUser) return token;
-
-    //   return token;
-
-    // }
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -65,6 +55,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   session:{
     strategy : "jwt",
   },
-  ...authConfig
+  providers: [
+    Google({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
+  ],
   
 });

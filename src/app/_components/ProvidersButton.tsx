@@ -9,7 +9,7 @@ interface ProvidersButtonProps {
 export const ProvidersButton = ({provider} : ProvidersButtonProps) => {
     const onClick = (provider: string) => {
         signIn(provider, {
-            callbackUrl: "/calendar"
+            callbackUrl: "/tasklist"
         })
     }
     return (
