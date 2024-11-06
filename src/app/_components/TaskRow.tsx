@@ -5,7 +5,7 @@ import { HiDotsVertical } from "react-icons/hi";
 
 interface TaskRowProps {
     children : React.ReactNode;
-    date : string;
+    date : Date;
     onClick : (isOn: boolean) => void;
 }
 
@@ -30,7 +30,7 @@ export const TaskRow = ({ children, date, onClick }: TaskRowProps) => {
 
             <div className='col-span-3 flex items-center'>
                 <p>
-                    {date}
+                    {date.toLocaleString().slice(0, 17)}
                 </p>
             </div>
 

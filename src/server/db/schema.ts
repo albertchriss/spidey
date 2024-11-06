@@ -21,9 +21,9 @@ export const createTable = pgTableCreator((name) => `spidey_${name}`);
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
-  .notNull()
-  .primaryKey()
-  .$defaultFn(() => crypto.randomUUID()),
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("email_verified", {
@@ -35,32 +35,33 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  tasks: many(tasks),
 }));
 
-export const tasks = createTable("task", {
-  id: serial("id").primaryKey(),
-  title: varchar("title", { length: 256 }).notNull(),
-  description: text("description"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+export const tasks = createTable(
+  "task",
+  {
+    id: serial("id").primaryKey(),
+    title: varchar("title", { length: 256 }).notNull(),
+    description: text("description"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
-  userId: varchar("user_id", { length: 255 })
-    .notNull()
-    .references(() => users.id),
-},
-(task) => ({
-  userIdIdx: index("user_id_idx").on(task.userId)
-})
-
-
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+  },
+  (task) => ({
+    userIdIdx: index("user_id_idx").on(task.userId),
+  }),
 );
 
-export const tasksRelations = relations(users, ({many}) => ({
-  tasks: many(tasks),
-}))
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  user: one(users, { fields: [tasks.userId], references: [users.id]})
+}));
 
 export const accounts = createTable(
   "account",

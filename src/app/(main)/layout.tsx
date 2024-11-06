@@ -8,12 +8,14 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const imgsrc = session?.user.image;
+  const email = session?.user.email;
   if (!session) {
     redirect("/");
   }
   return (
     <div className="relative flex min-h-screen w-full min-w-fit flex-col items-center overflow-hidden">
-      <Navbar />
+      <Navbar src={imgsrc ?? '/default-pp.svg'} email={email ?? ''}/>
       {children}
     </div>
   );

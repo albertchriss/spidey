@@ -1,33 +1,15 @@
-"use client"
-import React, { useState } from 'react'
-import { SignOutButton } from '~/app/_components/SignOutButton'
-import { TaskTable } from '~/app/_components/TaskTable';
-import { OptionBar } from '~/app/_components/OptionBar';
+import { SignOutButton } from "~/app/_components/SignOutButton";
+import { TaskTable } from "~/app/_components/TaskTable";
+import { auth } from "~/server/auth";
 
-const TaskListPage = () => {
-  const [showOptionBar, setShowOptionBar] = useState(false);
-  const onSelect = (isOn: boolean) => {
-    if (isOn){
-      setShowOptionBar(true);
-    }
-    else{
-      setShowOptionBar(false);
-    }
-  }
+const TaskListPage = async () => {
+  const session = await auth();
+  const userId = session?.user.id;
   return (
-    <div className='flex flex-col items-center min-h-screen h-full font-inter my-2 w-full '>
-        
-        <SignOutButton />
-        <TaskTable onSelect={(isOn) => onSelect(isOn)}/>
-        
-        {
-          showOptionBar 
-          ? <OptionBar />
-          : null
-        }
-
+    <div className="font-inter my-2 flex h-full min-h-screen w-full flex-col items-center">
+      <TaskTable userId={userId ?? ""} />
     </div>
-  )
-}
+  );
+};
 
-export default TaskListPage
+export default TaskListPage;

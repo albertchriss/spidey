@@ -11,3 +11,5 @@ npm install react-icons --save
 npx shadcn@latest add checkbox
 
 npx shadcn@latest add dropdown-menu
+
+npm install @metamorph/trpc-panel

@@ -26,6 +26,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      image: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -39,10 +40,18 @@ declare module "next-auth" {
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
+    async jwt({token, user}){
+      if (user && user.image){
+        token.image = user.image;
+      }
+      return token;
+    },
     async session({token, session}){
       if (token.sub && session.user){
         session.user.id = token.sub
+        session.user.image = token.image as string;
       }
+      
       return session;
     },
   },

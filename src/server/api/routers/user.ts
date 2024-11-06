@@ -11,13 +11,6 @@ import { users } from "~/server/db/schema";
 
 
 export const userRouter = createTRPCRouter({
-    getUserByEmail: publicProcedure.input(z.string()).query(
-        async ({ input }) => {
-            const result = await db.select().from(users).where(eq(users.email, input));
-            return (result && result[0]) || null;
-        }
-    ),
-
     getUserById: publicProcedure.input(z.string()).query(
         async ({ input }) => {
             const result = await db.select().from(users).where(eq(users.id, input));
