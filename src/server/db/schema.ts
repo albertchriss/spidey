@@ -52,7 +52,7 @@ export const tasks = createTable(
     ),
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, {onDelete: "cascade"}),
   },
   (task) => ({
     userIdIdx: index("user_id_idx").on(task.userId),

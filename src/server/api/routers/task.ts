@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { varchar } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
@@ -12,7 +12,7 @@ import { tasks } from "~/server/db/schema";
 export const taskRouter = createTRPCRouter({
   getTaskById: protectedProcedure.input(z.object({id: z.number()})).query(
     async ({ input, ctx }) => {
-      const data = await ctx.db.select().from(tasks).where(eq(tasks.id, input.id));
+      const data = await ctx.db.select().from(tasks).where(eq(tasks.id, input.id)).limit(1);
       return data[0] ?? null;
     }
   ),
@@ -41,4 +41,9 @@ export const taskRouter = createTRPCRouter({
         userId: input.userId,
       });
     }),
+
+    getAllTasks: publicProcedure.query(async ({ctx}) => {
+      const data = await ctx.db.select().from(tasks).orderBy(asc(tasks.createdAt))
+      return data;
+    })
 });
