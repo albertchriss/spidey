@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/alert-dialog";
 
 interface AlertDeleteProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onConfirm: () => void;
   open: boolean;
   setOpen: (value: boolean) => void;

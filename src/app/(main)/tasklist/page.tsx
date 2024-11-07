@@ -8,7 +8,7 @@ const TaskListPage = async () => {
   return (
     <div className="font-inter my-2 flex h-full w-full flex-col items-center">
       <TaskTable userId={userId ?? ""} />
-      <CreateTaskPopUp userId={userId ?? ""} isDisabled={false} />
+      <CreateTaskPopUp userId={userId ?? ""}/>
     </div>
   );
 };

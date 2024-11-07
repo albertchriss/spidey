@@ -60,13 +60,13 @@ export const TaskRow = ({
         </div>
 
         <div className="col-span-1 flex items-center justify-end">
-          <AlertDelete
-            onConfirm={() => handleDelete(TaskId)}
-            open={openAlert}
-            setOpen={setOpenAlert}
-          >
+            <AlertDelete
+                onConfirm={() => handleDelete(TaskId)}
+                open={openAlert}
+                setOpen={setOpenAlert}
+            />
             <TitikTiga showAlert={() => setOpenAlert(true)} />
-          </AlertDelete>
+          
         </div>
       </div>
     </div>

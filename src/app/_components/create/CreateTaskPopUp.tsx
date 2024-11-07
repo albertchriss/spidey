@@ -50,7 +50,6 @@ const TaskSchema = z.object({
 
 interface CreateTaskPopUpProps {
   //   playGif: () => void;
-  isDisabled: boolean;
   title?: string;
   description?: string;
   date?: Date;
@@ -58,7 +57,6 @@ interface CreateTaskPopUpProps {
 }
 
 export const CreateTaskPopUp = ({
-  isDisabled,
   userId,
   title,
   description,
@@ -229,7 +227,7 @@ export const CreateTaskPopUp = ({
             </div>
             <Button
               type="submit"
-              disabled={isPending || isDisabled}
+              disabled={isPending}
               className="w-full"
             >
               Create
