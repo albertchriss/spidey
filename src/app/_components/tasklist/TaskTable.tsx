@@ -4,12 +4,16 @@ import { TaskRow } from "./TaskRow";
 import { TaskHeader } from "./TaskHeader";
 import { OptionBar } from "~/app/_components/tasklist/OptionBar";
 import { api } from "~/trpc/react";
+import { Task } from "~/server/db/schema";
+
+
 
 interface TaskTableProps {
   userId: string;
+  updatedData?: Task[];
 }
 
-export const TaskTable = ({ userId }: TaskTableProps) => {
+export const TaskTable = ({ userId, updatedData }: TaskTableProps) => {
   // state stuff
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [numSelected, setNumSelected] = useState(0);
@@ -17,10 +21,14 @@ export const TaskTable = ({ userId }: TaskTableProps) => {
   const [deletedTasks, setDeletedTasks] = useState<number[]>([]);
 
   // query stuff
-  const { data } = api.task.getUserTasks.useQuery({
+  let { data } = api.task.getUserTasks.useQuery({
     id: userId,
     completed: false,
   });
+
+  if (updatedData && updatedData.length > 0){
+    data = [...updatedData, ...(data ?? [])];
+  }
 
   // mutation stuff
   const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({

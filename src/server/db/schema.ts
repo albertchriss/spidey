@@ -136,3 +136,6 @@ export const verificationTokens = createTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   }),
 );
+
+
+export type Task = typeof tasks.$inferSelect;

@@ -49,12 +49,23 @@ export const taskRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      await ctx.db.insert(tasks).values({
+      const newTask = await ctx.db.insert(tasks).values({
         title: input.title,
         description: input.description,
         deadline: input.deadline,
         userId: input.userId,
+      })
+      .returning({
+        id: tasks.id,
+        title: tasks.title,
+        description: tasks.description,
+        deadline: tasks.deadline,
+        isCompleted: tasks.isCompleted,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+        userId: tasks.userId, 
       });
+      return newTask[0];
     }),
 
   deleteTask: protectedProcedure

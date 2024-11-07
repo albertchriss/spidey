@@ -30,6 +30,7 @@ import {
 } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { PopUp } from "../PopUp";
+import { Task } from "~/server/db/schema";
 
 const slotProps: TimeClockSlotProps = {
   leftArrowIcon: { fontSize: "large" },
@@ -48,12 +49,14 @@ const TaskSchema = z.object({
   deadline: z.date(),
 });
 
+
 interface CreateTaskPopUpProps {
   //   playGif: () => void;
   title?: string;
   description?: string;
   date?: Date;
   userId: string;
+  handleUpdate?: (newTask: Task) => void;
 }
 
 export const CreateTaskPopUp = ({
@@ -61,10 +64,17 @@ export const CreateTaskPopUp = ({
   title,
   description,
   date,
+  handleUpdate,
 }: CreateTaskPopUpProps) => {
   const [isPending, startTransition] = useTransition();
   const [isOpenDialog, setIsOpenDialog] = useState(false);
-  const { mutate: createTask } = api.task.createTask.useMutation();
+  const { mutate: createTask } = api.task.createTask.useMutation({
+    onSuccess: (data) => {
+      if (data) {
+        handleUpdate?.(data as Task);
+      }
+    }
+  });
   const form = useForm<z.infer<typeof TaskSchema>>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
