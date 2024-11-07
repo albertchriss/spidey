@@ -1,9 +1,13 @@
 import React from 'react'
-import Link from "next/link"
-import { Button } from '~/components/ui/button'
 import { ProvidersButton } from './_components/ProvidersButton'
+import { auth } from '~/server/auth'
+import { redirect } from "next/navigation";
 
-const LandingPage = () => {
+const LandingPage = async () => {
+  const session = await auth();
+  if (session){
+    redirect("/tasklist")
+  }
   return (
     <div className='flex flex-col justify-center items-center min-h-screen w-full gap-4'>
       <div className='mb-4 space-y-4'>

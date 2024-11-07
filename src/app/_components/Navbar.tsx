@@ -43,7 +43,7 @@ export const Navbar = ({ src, email }: NavbarProps) => {
   }, []);
 
   return (
-    <div className="sticky top-0 z-[10] h-fit w-full border-b border-zinc-300 bg-zinc-100">
+    <div className="fixed top-0 z-30 h-fit w-full border-b border-zinc-300 bg-zinc-100">
       <div className="flex h-full w-full items-center justify-between gap-2 px-10 py-2">
         <DropdownProfile src={src} email={email}/>
         <div className="my-auto">

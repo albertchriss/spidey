@@ -22,6 +22,34 @@
       "when": 1730941880348,
       "tag": "0002_previous_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1730958649226,
+      "tag": "0003_slow_mesmero",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1730959316450,
+      "tag": "0004_nervous_ultimates",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1730959439900,
+      "tag": "0005_tan_baron_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1730978250148,
+      "tag": "0006_third_rage",
+      "breakpoints": true
     }
   ]
 }

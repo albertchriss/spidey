@@ -1,0 +1,1 @@
+ALTER TABLE "spidey_task" ALTER COLUMN "deadline" SET NOT NULL;

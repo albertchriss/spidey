@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   varchar,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -42,8 +43,10 @@ export const tasks = createTable(
   "task",
   {
     id: serial("id").primaryKey(),
-    title: varchar("title", { length: 256 }).notNull(),
+    title: varchar("title", { length: 100 }).notNull(),
     description: text("description"),
+    deadline: timestamp("deadline", { withTimezone: true }).notNull(),
+    isCompleted: boolean("is_completed").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -52,7 +55,7 @@ export const tasks = createTable(
     ),
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id, {onDelete: "cascade"}),
+      .references(() => users.id, { onDelete: "cascade" }),
   },
   (task) => ({
     userIdIdx: index("user_id_idx").on(task.userId),
@@ -60,7 +63,7 @@ export const tasks = createTable(
 );
 
 export const tasksRelations = relations(tasks, ({ one }) => ({
-  user: one(users, { fields: [tasks.userId], references: [users.id]})
+  user: one(users, { fields: [tasks.userId], references: [users.id] }),
 }));
 
 export const accounts = createTable(

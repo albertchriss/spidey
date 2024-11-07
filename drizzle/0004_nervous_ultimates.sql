@@ -1,0 +1,1 @@
+ALTER TABLE "spidey_task" ADD COLUMN "deadline" timestamp with time zone;
