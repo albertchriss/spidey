@@ -7,34 +7,22 @@ import { AlertDelete } from "../AlertDelete";
 
 interface TaskRowProps {
   children: React.ReactNode;
-  title: string;
-  description?: string;
   date: Date;
   onClick: (isOn: boolean, TaskId: number) => void;
   isSelectedAll: boolean;
   TaskId: number;
-  deletedTasks: number[];
   handleDelete: (taskId: number) => void;
-  setIsOpenDialog: (value: boolean) => void;
-  setTitle: (value: string) => void;
-  setDescription: (value: string|undefined) => void;
-  setDate: (value: Date) => void;
+  handleFormValue: () => void;
 }
 
 export const TaskRow = ({
   children,
-  title,
-  description,
   date,
   onClick,
   isSelectedAll,
   TaskId,
-  deletedTasks,
   handleDelete,
-  setIsOpenDialog,
-  setTitle,
-  setDescription,
-  setDate,
+  handleFormValue,
 }: TaskRowProps) => {
   const [isSelected, setIsSelected] = useState(false);
   const onChange = (isOn: boolean) => {
@@ -48,9 +36,6 @@ export const TaskRow = ({
     setIsSelected(false);
   }
 
-  if (deletedTasks.includes(TaskId)) {
-    return null;
-  }
   return (
     <div
       className="w-full border-b border-gray-400"
@@ -79,13 +64,7 @@ export const TaskRow = ({
           />
           <TitikTiga
             showAlert={() => setOpenAlert(true)}
-            setIsOpenDialog={setIsOpenDialog}
-            setTitle={setTitle}
-            setDescription={setDescription}
-            setDate={setDate}
-            title={title}
-            description={description}
-            date={date}
+            handleFormValue={handleFormValue}
           />
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
 
 interface AlertDeleteProps {
   children?: React.ReactNode;
@@ -27,9 +28,15 @@ export const AlertDelete = ({ children, onConfirm, open, setOpen }: AlertDeleteP
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <button onClick={() => setOpen(true)}>{children}</button>
-      </AlertDialogTrigger>
+      {
+        children ?
+        <AlertDialogTrigger asChild>
+          {children}
+        </AlertDialogTrigger>
+        :
+        null
+
+      }
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

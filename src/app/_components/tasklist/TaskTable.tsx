@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { TaskRow } from "./TaskRow";
 import { TaskHeader } from "./TaskHeader";
 import { OptionBar } from "~/app/_components/tasklist/OptionBar";
@@ -8,53 +8,71 @@ import { Task } from "~/server/db/schema";
 
 interface TaskTableProps {
   userId: string;
-  updatedData?: Task[];
-  setIsOpenDialog: (value: boolean) => void;
-  setTitle: (value: string) => void;
-  setDescription: (value: string | undefined) => void;
-  setDate: (value: Date) => void;
+  updatedData?: Task;
+  editedData?: Task;
+  handleFormValue: (title: string, description: string, date: Date, taskId: number) => void;
+  setUpdatedData: (newTask: Task | undefined) => void;
+  setEditedData: (newTask: Task | undefined) => void;
 }
 
 export const TaskTable = ({
   userId,
   updatedData,
-  setIsOpenDialog,
-  setTitle,
-  setDescription,
-  setDate,
+  editedData,
+  handleFormValue,
+  setUpdatedData,
+  setEditedData,
 }: TaskTableProps) => {
   // state stuff
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [numSelected, setNumSelected] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
-  const [deletedTasks, setDeletedTasks] = useState<number[]>([]);
+  const [data, setData] = useState<Task[]>([]);
 
   // query stuff
-  let { data } = api.task.getUserTasks.useQuery({
+  const { data: query } = api.task.getUserTasks.useQuery({
     id: userId,
     completed: false,
   });
 
-  if (updatedData && updatedData.length > 0) {
-    data = [...updatedData, ...(data ?? [])];
-  }
+  useEffect(() => {
+    if (query) {
+      setData(query);
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (updatedData) {
+      setData((prevData) => [...prevData, updatedData]);
+      setUpdatedData(undefined);
+    }
+  }, [updatedData]);
+
+  useEffect(() => {
+    if (editedData) {
+      setData((prevData) =>
+        prevData.map((task) => (task.id === editedData.id ? editedData : task)),
+      );
+      setEditedData(undefined);
+    }
+  }, [editedData]);
+
+  useEffect(() => {
+    setNumSelected(selectedTasks.length);
+  }, [selectedTasks]);
 
   // mutation stuff
   const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({
-    onSuccess: (data, variables) => {
+    onMutate: (variables) => {
       const taskIds = variables.ids;
-      setDeletedTasks([...deletedTasks, ...taskIds]);
-      setNumSelected(selectedTasks.length - taskIds.length);
+      setData(data?.filter((task) => !taskIds.includes(task.id)));
       setSelectedTasks(selectedTasks.filter((id) => !taskIds.includes(id)));
     },
   });
   const { mutate: deleteTask } = api.task.deleteTask.useMutation({
-    onSuccess: (data, variables) => {
+    onMutate: (variables) => {
       const taskId = variables.id;
-      setDeletedTasks([...deletedTasks, taskId]);
-      setNumSelected(
-        selectedTasks.length - (selectedTasks.includes(taskId) ? 1 : 0),
-      );
+      setData(data?.filter((task) => task.id !== taskId));
       setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
     },
   });
@@ -63,24 +81,21 @@ export const TaskTable = ({
   const handleSelectAll = () => {
     setIsSelectedAll(!isSelectedAll);
     if (isSelectedAll) {
-      setNumSelected(0);
       setSelectedTasks([]);
     } else {
-      setNumSelected(data?.length ?? 0);
       setSelectedTasks(data?.map((task) => task.id) ?? []);
     }
   };
   const onClick = (isOn: boolean, taskId: number) => {
     if (isOn) {
-      setNumSelected(numSelected - 1);
       setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
     } else {
-      setNumSelected(numSelected + 1);
       setSelectedTasks([...selectedTasks, taskId]);
     }
   };
   const handleDeleteTasks = () => {
     deleteSomeTasks({ ids: selectedTasks });
+    setSelectedTasks([]);
   };
   const handleDeleteOneTask = (taskId: number) => {
     deleteTask({ id: taskId });
@@ -88,7 +103,7 @@ export const TaskTable = ({
 
   return (
     <div className="mt-[60px] flex h-full w-full max-w-7xl flex-col items-center overflow-auto px-[3%]">
-      {(data?.length ?? 0 > 0) && data?.length !== deletedTasks.length ? (
+      {data.length > 0 ? (
         <div className="flex w-full flex-col items-center">
           {/* table title */}
           <div className="mb-2 flex h-[50px] w-full items-center">
@@ -110,20 +125,21 @@ export const TaskTable = ({
               Task Title
             </TaskHeader>
 
-            {data?.map((items) => (
+            {data.map((items) => (
               <TaskRow
                 onClick={onClick}
-                title={items.title}
-                description={items?.description ?? undefined}
                 date={items.deadline}
                 isSelectedAll={isSelectedAll}
                 TaskId={items.id}
-                deletedTasks={deletedTasks}
                 handleDelete={handleDeleteOneTask}
-                setIsOpenDialog={setIsOpenDialog}
-                setTitle={setTitle}
-                setDescription={setDescription}
-                setDate={setDate}
+                handleFormValue={() =>
+                  handleFormValue(
+                    items.title,
+                    items.description ?? "",
+                    items.deadline,
+                    items.id,
+                  )
+                }
               >
                 {items.title}
               </TaskRow>

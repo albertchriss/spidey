@@ -14,32 +14,54 @@ export const TaskList = ({ userId }: TaskList) => {
   const [title, setTitle] = useState<string | undefined>();
   const [description, setDescription] = useState<string | undefined>();
   const [date, setDate] = useState<Date | undefined>();
+  const [taskId, setTaskId] = useState<number | undefined>();
 
-  const [updatedData, setUpdatedData] = useState<Task[]>([]);
-  const handleUpdateDate = (newTask: Task) => {
-    setUpdatedData([...updatedData, newTask]);
+  const handleFormValue = (title: string, description: string, date: Date, taskId: number) => {
+    setIsOpenDialog(true);
+    setTitle(title);
+    setDescription(description);
+    setDate(date);
+    setTaskId(taskId);
+  }
+
+  const setUndefined = () => {
+    setTitle(undefined);
+    setDescription(undefined);
+    setDate(undefined);
+    setTaskId(undefined);
+  }
+
+  const [updatedData, setUpdatedData] = useState<Task | undefined>();
+  const handleUpdateData = (newTask: Task) => {
+    setUpdatedData(newTask);
   };
+
+  const [editedData, setEditedData] = useState<Task | undefined>();
+  const handleEditData = (newTask: Task) => {
+    setEditedData(newTask);
+  }
+
   return (
     <>
       <TaskTable
         userId={userId ?? ""}
+        handleFormValue={handleFormValue}
         updatedData={updatedData}
-        setIsOpenDialog={setIsOpenDialog}
-        setTitle={setTitle}
-        setDescription={setDescription}
-        setDate={setDate}
+        setUpdatedData={setUpdatedData}
+        editedData={editedData}
+        setEditedData={setEditedData}
       />
       <CreateTaskPopUp
         userId={userId ?? ""}
-        handleUpdate={handleUpdateDate}
+        handleUpdate={handleUpdateData}
+        handleEdit={handleEditData}
         isOpenDialog={isOpenDialog}
         setIsOpenDialog={setIsOpenDialog}
         title={title}
         description={description}
         date={date}
-        setTitle={setTitle}
-        setDescription={setDescription}
-        setDate={setDate}
+        taskId={taskId}
+        setUndefined = {setUndefined}
       />
     </>
   );

@@ -49,22 +49,24 @@ export const taskRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const newTask = await ctx.db.insert(tasks).values({
-        title: input.title,
-        description: input.description,
-        deadline: input.deadline,
-        userId: input.userId,
-      })
-      .returning({
-        id: tasks.id,
-        title: tasks.title,
-        description: tasks.description,
-        deadline: tasks.deadline,
-        isCompleted: tasks.isCompleted,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-        userId: tasks.userId, 
-      });
+      const newTask = await ctx.db
+        .insert(tasks)
+        .values({
+          title: input.title,
+          description: input.description,
+          deadline: input.deadline,
+          userId: input.userId,
+        })
+        .returning({
+          id: tasks.id,
+          title: tasks.title,
+          description: tasks.description,
+          deadline: tasks.deadline,
+          isCompleted: tasks.isCompleted,
+          createdAt: tasks.createdAt,
+          updatedAt: tasks.updatedAt,
+          userId: tasks.userId,
+        });
       return newTask[0];
     }),
 
@@ -78,5 +80,29 @@ export const taskRouter = createTRPCRouter({
     .input(z.object({ ids: z.array(z.number()) }))
     .mutation(async ({ input, ctx }) => {
       await ctx.db.delete(tasks).where(inArray(tasks.id, input.ids));
+    }),
+
+  updateTask: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1).max(100).optional(),
+        description: z.string().optional(),
+        deadline: z.date().optional(),
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Construct an update object only with fields that have a value
+      await ctx.db
+        .update(tasks)
+        .set({
+          ...(input.title !== undefined && { title: input.title }),
+          ...(input.description !== undefined && { description: input.description }),
+          ...(input.deadline !== undefined && { deadline: input.deadline }),
+        })
+        .where(eq(tasks.id, input.id));
+
+      const updatedTask = await ctx.db.select().from(tasks).where(eq(tasks.id, input.id)).limit(1);
+      return updatedTask[0] ?? null;
     }),
 });

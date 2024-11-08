@@ -18,9 +18,7 @@ import { useEffect, useState, useTransition } from "react";
 import { api } from "~/trpc/react";
 import { Input } from "~/components/ui/input";
 import {
-  DateTimePicker,
   LocalizationProvider,
-  StaticDateTimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -49,18 +47,17 @@ const TaskSchema = z.object({
   deadline: z.date(),
 });
 
-
 interface CreateTaskPopUpProps {
   title?: string;
   description?: string;
   date?: Date;
+  taskId?: number;
   userId: string;
-  handleUpdate?: (newTask: Task) => void;
+  handleUpdate: (newTask: Task) => void;
+  handleEdit : (newTask: Task) => void;
   isOpenDialog: boolean;
   setIsOpenDialog: (value: boolean) => void;
-  setTitle: (value: string | undefined) => void;
-  setDescription: (value: string | undefined) => void;
-  setDate: (value: Date | undefined) => void;
+  setUndefined: () => void;
 }
 
 export const CreateTaskPopUp = ({
@@ -68,25 +65,42 @@ export const CreateTaskPopUp = ({
   title,
   description,
   date,
+  taskId,
   handleUpdate,
+  handleEdit,
   isOpenDialog,
   setIsOpenDialog,
-  setTitle,
-  setDescription,
-  setDate,
+  setUndefined,
 }: CreateTaskPopUpProps) => {
+  const [isCreate, setIsCreate] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
+    date ? dayjs(date) : null,
+  );
+
+  const [inputValue, setInputValue] = useState(
+    selectedDate ? selectedDate.format("DD/MM/YYYY HH:mm") : "",
+  );
+
   const { mutate: createTask } = api.task.createTask.useMutation({
-    onMutate: () => {
-      console.log("loading...")
+    onMutate: (data) => {
+      handleUpdate(data as Task);
     },
-    onSuccess: (data) => {
-      if (data) {
-        handleUpdate?.(data as Task);
-      }
+    onSuccess: () => {
+      setUndefined();
+    }
+    // onError ntar atur
+  });
+
+  const { mutate: updateTask } = api.task.updateTask.useMutation({
+    onMutate: (data) => {
+      handleEdit(data as Task);
+    },
+    onSuccess: () => {
+      setUndefined();
     }
   });
-  
+
   const form = useForm<z.infer<typeof TaskSchema>>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
@@ -104,41 +118,34 @@ export const CreateTaskPopUp = ({
     });
     setSelectedDate(date ? dayjs(date) : null);
     setInputValue(date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "");
-    
   }, [title, description, date, form]);
-
-  const onChange = (value: boolean) => {
-    if (value){
-      setTitle(undefined);
-      setDescription(undefined);
-      setDate(undefined);
+  
+  useEffect(() => {
+    if (isCreate) {
+      setUndefined();
     }
-  }
+  }, [isCreate]);
+
 
   const onSubmit = (data: z.infer<typeof TaskSchema>) => {
-    if (!title){
+    if (!taskId) {
+      console.log("create");
       startTransition(() => {
         createTask({ ...data, userId });
-        
-        
       });
-    }
-    else{
-      console.log("edit");
+    } else {
+      console.log("update");
+      startTransition(() => {
+        updateTask({ ...data, id: taskId });
+      });
     }
     setIsOpenDialog(false);
     form.reset();
     setSelectedDate(null);
     setInputValue("");
+    
   };
 
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
-    date ? dayjs(date) : null,
-  );
-
-  const [inputValue, setInputValue] = useState(
-    selectedDate ? selectedDate.format("DD/MM/YYYY HH:mm") : "",
-  );
   const handleDateChange = (newDate: Dayjs | null) => {
     setSelectedDate((prev) => {
       // Retain the time from the previous date, only update the date
@@ -176,7 +183,6 @@ export const CreateTaskPopUp = ({
     });
   };
 
-  // Handle input change, converting from string to Date
   const handleInputChange = (stringDate: string) => {
     // Convert the input string to a Date object
     const parsedDate = dayjs(stringDate, "DD/MM/YYYY HH:mm").toDate();
@@ -197,7 +203,7 @@ export const CreateTaskPopUp = ({
         description="Define the task title, description (optional), and deadline"
         isOpen={isOpenDialog}
         setIsOpen={setIsOpenDialog}
-        onChange={onChange}
+        setIsCreate={setIsCreate}
       >
         <Form {...form}>
           <form
@@ -205,7 +211,7 @@ export const CreateTaskPopUp = ({
             className="flex w-full flex-col items-center"
           >
             <div className="flex w-full items-center justify-end gap-5">
-              <div className="flex h-full flex-col space-y-4 flex-1 min-w-[10px]">
+              <div className="flex h-full min-w-[10px] flex-1 flex-col space-y-4">
                 <FormField
                   control={form.control}
                   name="title"
@@ -278,11 +284,7 @@ export const CreateTaskPopUp = ({
                 </div>
               </div>
             </div>
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="w-full"
-            >
+            <Button type="submit" disabled={isPending} className="w-full">
               Create
             </Button>
           </form>
