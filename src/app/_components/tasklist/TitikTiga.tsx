@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +12,32 @@ import { HiDotsVertical } from "react-icons/hi";
 
 interface TitikTigaProps {
   showAlert: () => void;
+  title: string;
+  description?: string;
+  date: Date;
+  setIsOpenDialog: (isOpen: boolean) => void;
+  setTitle: (value: string) => void;
+  setDescription: (value: string | undefined) => void;
+  setDate: (value: Date) => void;
 }
 
-export const TitikTiga = ({ showAlert }: TitikTigaProps) => {
+export const TitikTiga = ({
+  showAlert,
+  title,
+  description,
+  date,
+  setIsOpenDialog,
+  setTitle,
+  setDescription,
+  setDate,
+}: TitikTigaProps) => {
+  const handleOnclick = () => {
+    setIsOpenDialog(true);
+    // console.log(title);
+    setTitle(title);
+    setDescription(description);
+    setDate(date);
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -22,8 +45,8 @@ export const TitikTiga = ({ showAlert }: TitikTigaProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={showAlert}>Delete</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleOnclick}>Edit</DropdownMenuItem>
         <DropdownMenuItem>Mark as complete</DropdownMenuItem>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

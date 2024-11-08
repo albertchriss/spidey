@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { api } from "~/trpc/react";
 import { Input } from "~/components/ui/input";
 import {
@@ -51,12 +51,16 @@ const TaskSchema = z.object({
 
 
 interface CreateTaskPopUpProps {
-  //   playGif: () => void;
   title?: string;
   description?: string;
   date?: Date;
   userId: string;
   handleUpdate?: (newTask: Task) => void;
+  isOpenDialog: boolean;
+  setIsOpenDialog: (value: boolean) => void;
+  setTitle: (value: string | undefined) => void;
+  setDescription: (value: string | undefined) => void;
+  setDate: (value: Date | undefined) => void;
 }
 
 export const CreateTaskPopUp = ({
@@ -65,29 +69,67 @@ export const CreateTaskPopUp = ({
   description,
   date,
   handleUpdate,
+  isOpenDialog,
+  setIsOpenDialog,
+  setTitle,
+  setDescription,
+  setDate,
 }: CreateTaskPopUpProps) => {
   const [isPending, startTransition] = useTransition();
-  const [isOpenDialog, setIsOpenDialog] = useState(false);
   const { mutate: createTask } = api.task.createTask.useMutation({
+    onMutate: () => {
+      console.log("loading...")
+    },
     onSuccess: (data) => {
       if (data) {
         handleUpdate?.(data as Task);
       }
     }
   });
+  
   const form = useForm<z.infer<typeof TaskSchema>>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
       title: title ?? undefined,
       description: description ?? undefined,
+      deadline: date ?? undefined,
     },
   });
 
-  const onSubmit = (data: z.infer<typeof TaskSchema>) => {
-    startTransition(() => {
-      createTask({ ...data, userId });
-      setIsOpenDialog(false);
+  useEffect(() => {
+    form.reset({
+      title: title ?? "",
+      description: description ?? "",
+      deadline: date ?? undefined,
     });
+    setSelectedDate(date ? dayjs(date) : null);
+    setInputValue(date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "");
+    
+  }, [title, description, date, form]);
+
+  const onChange = (value: boolean) => {
+    if (value){
+      setTitle(undefined);
+      setDescription(undefined);
+      setDate(undefined);
+    }
+  }
+
+  const onSubmit = (data: z.infer<typeof TaskSchema>) => {
+    if (!title){
+      startTransition(() => {
+        createTask({ ...data, userId });
+        
+        
+      });
+    }
+    else{
+      console.log("edit");
+    }
+    setIsOpenDialog(false);
+    form.reset();
+    setSelectedDate(null);
+    setInputValue("");
   };
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
@@ -155,14 +197,15 @@ export const CreateTaskPopUp = ({
         description="Define the task title, description (optional), and deadline"
         isOpen={isOpenDialog}
         setIsOpen={setIsOpenDialog}
+        onChange={onChange}
       >
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex w-full flex-col items-center"
           >
-            <div className="flex w-full flex-row items-center justify-center gap-5">
-              <div className="flex h-full w-[50%] flex-col space-y-4">
+            <div className="flex w-full items-center justify-end gap-5">
+              <div className="flex h-full flex-col space-y-4 flex-1 min-w-[10px]">
                 <FormField
                   control={form.control}
                   name="title"
@@ -198,7 +241,7 @@ export const CreateTaskPopUp = ({
                   )}
                 />
               </div>
-              <div className="h-full w-[50%]">
+              <div className="h-full w-[600px] shrink-0">
                 <div className="flex h-full flex-col">
                   <FormField
                     control={form.control}

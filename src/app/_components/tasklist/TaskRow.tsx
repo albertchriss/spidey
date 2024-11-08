@@ -7,22 +7,34 @@ import { AlertDelete } from "../AlertDelete";
 
 interface TaskRowProps {
   children: React.ReactNode;
+  title: string;
+  description?: string;
   date: Date;
   onClick: (isOn: boolean, TaskId: number) => void;
   isSelectedAll: boolean;
   TaskId: number;
   deletedTasks: number[];
   handleDelete: (taskId: number) => void;
+  setIsOpenDialog: (value: boolean) => void;
+  setTitle: (value: string) => void;
+  setDescription: (value: string|undefined) => void;
+  setDate: (value: Date) => void;
 }
 
 export const TaskRow = ({
   children,
+  title,
+  description,
   date,
   onClick,
   isSelectedAll,
   TaskId,
   deletedTasks,
   handleDelete,
+  setIsOpenDialog,
+  setTitle,
+  setDescription,
+  setDate,
 }: TaskRowProps) => {
   const [isSelected, setIsSelected] = useState(false);
   const onChange = (isOn: boolean) => {
@@ -60,13 +72,21 @@ export const TaskRow = ({
         </div>
 
         <div className="col-span-1 flex items-center justify-end">
-            <AlertDelete
-                onConfirm={() => handleDelete(TaskId)}
-                open={openAlert}
-                setOpen={setOpenAlert}
-            />
-            <TitikTiga showAlert={() => setOpenAlert(true)} />
-          
+          <AlertDelete
+            onConfirm={() => handleDelete(TaskId)}
+            open={openAlert}
+            setOpen={setOpenAlert}
+          />
+          <TitikTiga
+            showAlert={() => setOpenAlert(true)}
+            setIsOpenDialog={setIsOpenDialog}
+            setTitle={setTitle}
+            setDescription={setDescription}
+            setDate={setDate}
+            title={title}
+            description={description}
+            date={date}
+          />
         </div>
       </div>
     </div>

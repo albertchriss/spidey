@@ -18,11 +18,16 @@ interface PopUpProps {
   children: React.ReactNode;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  onChange: (value: boolean) => void;
 }
 
-export function PopUp({ trigger, title, description, children, isOpen, setIsOpen }: PopUpProps) {
+export function PopUp({ trigger, title, description, children, isOpen, setIsOpen, onChange }: PopUpProps) {
+  const onOpenChange = (value: boolean) => {
+    setIsOpen(value);
+    onChange(isOpen);
+  }
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className="absolute bottom-[2%] right-[2%] flex size-12 items-center justify-center rounded-full text-4xl" onClick={() => setIsOpen(true)}>
           {trigger}
