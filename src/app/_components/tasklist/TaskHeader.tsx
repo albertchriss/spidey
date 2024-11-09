@@ -35,7 +35,7 @@ export const TaskHeader = ({
           <p className="text-lg text-slate-700">Select All</p>
           <Checkbox
             className="size-5"
-            onCheckedChange={() => handleChange()}
+            onCheckedChange={handleChange}
             checked={isSelectedAll}
           />
         </div>

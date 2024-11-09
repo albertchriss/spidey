@@ -105,4 +105,13 @@ export const taskRouter = createTRPCRouter({
       const updatedTask = await ctx.db.select().from(tasks).where(eq(tasks.id, input.id)).limit(1);
       return updatedTask[0] ?? null;
     }),
+
+  markTask: protectedProcedure
+  .input( z.object({ id: z.number(), isCompleted: z.boolean() }))
+  .mutation(async ({ input, ctx}) => {
+    await ctx.db
+      .update(tasks)
+      .set({ isCompleted: input.isCompleted })
+      .where(eq(tasks.id, input.id));
+  })
 });

@@ -13,12 +13,13 @@ import { HiDotsVertical } from "react-icons/hi";
 interface TitikTigaProps {
   showAlert: () => void;
   handleFormValue: () => void;
+  showEdit?: boolean;
 }
 
 export const TitikTiga = ({
   showAlert,
   handleFormValue,
-
+  showEdit
 }: TitikTigaProps) => {
   return (
     <DropdownMenu>
@@ -27,8 +28,11 @@ export const TitikTiga = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={showAlert}>Delete</DropdownMenuItem>
-        <DropdownMenuItem onClick={handleFormValue}>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Mark as complete</DropdownMenuItem>
+        {
+          showEdit && (
+            <DropdownMenuItem onClick={handleFormValue}>Edit</DropdownMenuItem>
+          )
+        }
       </DropdownMenuContent>
     </DropdownMenu>
   );

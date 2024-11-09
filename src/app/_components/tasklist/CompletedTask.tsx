@@ -10,27 +10,20 @@ import { TableSkeleton } from "./TableSkeleton";
 
 interface TaskTableProps {
   userId: string;
-  updatedData?: Task;
-  editedData?: Task;
-  handleFormValue: (
-    title: string,
-    description: string,
-    date: Date,
-    taskId: number,
-  ) => void;
+  completedData?: Task;
+  handleFormValue: (title: string, description: string, date: Date, taskId: number) => void;
   setUpdatedData: (newTask: Task | undefined) => void;
-  setEditedData: (newTask: Task | undefined) => void;
   setCompletedData: (newTask: Task | undefined) => void;
+  setNumCompleted: (num: number) => void;
 }
 
-export const TaskTable = ({
+export const CompletedTask = ({
   userId,
-  updatedData,
-  editedData,
+  completedData,
   handleFormValue,
   setUpdatedData,
-  setEditedData,
   setCompletedData,
+  setNumCompleted,
 }: TaskTableProps) => {
   // state stuff
   const [isSelectedAll, setIsSelectedAll] = useState(false);
@@ -41,7 +34,7 @@ export const TaskTable = ({
   // query stuff
   const { data: query } = api.task.getUserTasks.useQuery({
     id: userId,
-    completed: false,
+    completed: true,
   });
 
   useEffect(() => {
@@ -51,29 +44,26 @@ export const TaskTable = ({
   }, [query]);
 
   useEffect(() => {
-    if (updatedData) {
-      setData((prevData) => [...prevData, updatedData]);
-      setUpdatedData(undefined);
+    if (completedData) {
+      setData((prevData) => [...prevData, completedData]);
+      setCompletedData(undefined);
+      setIsSelectedAll(false);
     }
-  }, [updatedData]);
-
-  useEffect(() => {
-    if (editedData) {
-      setData((prevData) =>
-        prevData.map((task) => (task.id === editedData.id ? editedData : task)),
-      );
-      setEditedData(undefined);
-    }
-  }, [editedData]);
+  }, [completedData]);
 
   useEffect(() => {
     setNumSelected(selectedTasks.length);
-    if (selectedTasks.length === data.length) {
+    if (selectedTasks.length === data.length){
       setIsSelectedAll(true);
-    } else {
-      setIsSelectedAll(false);
+    }
+    else{
+      setIsSelectedAll(false)
     }
   }, [selectedTasks, data]);
+
+  useEffect(() => {
+    setNumCompleted(data.length);
+  }, [data])
 
   // mutation stuff
   const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({
@@ -90,14 +80,14 @@ export const TaskTable = ({
       setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
     },
   });
-  const { mutate: completeTask } = api.task.markTask.useMutation({
+  const { mutate: uncompleteTask } = api.task.markTask.useMutation({
     onMutate: (variables) => {
       const taskId = variables.id;
-      setCompletedData(data?.find((task) => task.id === taskId));
       setData(data?.filter((task) => task.id !== taskId));
       setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
+      setUpdatedData(data?.find((task) => task.id === taskId));
     },
-  });
+  })
 
   // functions stuff
   const handleSelectAll = () => {
@@ -123,74 +113,75 @@ export const TaskTable = ({
   };
 
   const handleComplete = (taskId: number) => {
-    completeTask({ id: taskId, isCompleted: true });
-  };
+    uncompleteTask({ id: taskId, isCompleted: false }); 
+  }
 
   if (!query) {
-    // console.log("loading")
     return (
-      <TableSkeleton />
+        <TableSkeleton />
     );
   }
 
   if (data.length === 0) {
-    return <h1 className="mt-[7%] mb-[3%] text-gray-600">No ongoing task.</h1>;
+    return (
+        <h1>No completed task.</h1>
+    )
   }
 
   return (
-    <div className="mt-[60px] flex h-full w-full max-w-7xl flex-col items-center overflow-auto px-[3%]">
-      <div className="flex w-full flex-col items-center">
-        {/* table title */}
-        <div className="mb-2 flex h-[50px] w-full items-center">
-          {numSelected > 0 ? (
-            <OptionBar handleDelete={handleDeleteTasks} mark/>
-          ) : (
-            <h1 className="text-3xl font-bold">Your Tasks</h1>
-          )}
-        </div>
+    <div className="flex h-full w-full max-w-7xl flex-col items-center overflow-auto px-[3%]">
+        <div className="flex w-full flex-col items-center">
+          
+          {/* table title */}
+          <div className="mb-2 flex h-[50px] w-full items-center">
+            {numSelected > 0 ? (
+              <OptionBar handleDelete={handleDeleteTasks} />
+            ) : (
+              <h1 className="text-3xl font-bold">Completed Tasks</h1>
+            )}
+          </div>
 
-        {/* table content */}
-        <div className="mb-2 flex w-full flex-col items-center">
-          {/* table header */}
-          <TaskHeader
-            handleChange={handleSelectAll}
-            date="Deadline"
-            isSelectedAll={isSelectedAll}
-          >
-            Task Title
-          </TaskHeader>
-
-          {data.map((items) => (
-            <TaskRow
-              key={items.id}
-              onClick={onClick}
-              date={items.deadline}
-              description={items.description ?? ""}
-              isCompleted={false}
-              showEdit
-              isSelected={selectedTasks.includes(items.id)}
-              TaskId={items.id}
-              handleDelete={handleDeleteOneTask}
-              handleFormValue={() =>
-                handleFormValue(
-                  items.title,
-                  items.description ?? "",
-                  items.deadline,
-                  items.id,
-                )
-              }
-              handleComplete={() => handleComplete(items.id)}
+          {/* table content */}
+          <div className="mb-2 flex w-full flex-col items-center">
+            {/* table header */}
+            <TaskHeader
+              handleChange={handleSelectAll}
+              date="Deadline"
+              isSelectedAll={isSelectedAll}
             >
-              {items.title}
-            </TaskRow>
-          ))}
-        </div>
+              Task Title
+            </TaskHeader>
 
-        {/* table footer */}
-        <div className="mt-2 flex w-full">
-          <p className="text-slate-500">{numSelected} selected</p>
+            {data.map((items) => (
+              <TaskRow
+                key={items.id}
+                onClick={onClick}
+                date={items.deadline}
+                description={items.description ?? ""}
+                isCompleted={true}
+                isSelected={selectedTasks.includes(items.id)}
+                TaskId={items.id}
+                handleDelete={handleDeleteOneTask}
+                handleFormValue={() =>
+                  handleFormValue(
+                    items.title,
+                    items.description ?? "",
+                    items.deadline,
+                    items.id,
+                  )
+                }
+                handleComplete={() => handleComplete(items.id)}
+              >
+                {items.title}
+              </TaskRow>
+            ))}
+          </div>
+
+          {/* table footer */}
+          <div className="mt-2 flex w-full">
+            <p className="text-slate-500">{numSelected} selected</p>
+          </div>
         </div>
-      </div>
     </div>
   );
 };

@@ -129,12 +129,10 @@ export const CreateTaskPopUp = ({
 
   const onSubmit = (data: z.infer<typeof TaskSchema>) => {
     if (!taskId) {
-      console.log("create");
       startTransition(() => {
         createTask({ ...data, userId });
       });
     } else {
-      console.log("update");
       startTransition(() => {
         updateTask({ ...data, id: taskId });
       });
@@ -285,7 +283,7 @@ export const CreateTaskPopUp = ({
               </div>
             </div>
             <Button type="submit" disabled={isPending} className="w-full">
-              Create
+              Save Changes
             </Button>
           </form>
         </Form>
