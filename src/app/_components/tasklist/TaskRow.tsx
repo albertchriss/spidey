@@ -4,6 +4,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { TitikTiga } from "./TitikTiga";
 import { HiChevronDown } from "react-icons/hi";
 import { AlertDelete } from "../AlertDelete";
+import { Skeleton } from "~/components/ui/skeleton";
 
 interface TaskRowProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ interface TaskRowProps {
   showEdit?: boolean;
   onClick: (isOn: boolean, TaskId: number) => void;
   isSelected: boolean;
-  TaskId: number;
+  TaskId?: number;
   handleDelete: (taskId: number) => void;
   handleFormValue: () => void;
   handleComplete: () => void;
@@ -36,7 +37,7 @@ export const TaskRow = ({
   const [openDetails, setOpenDetails] = useState(false);
 
   const onChange = (isOn: boolean) => {
-    onClick(isOn, TaskId);
+    if (TaskId) onClick(isOn, TaskId);
   };
 
   return (
@@ -47,7 +48,7 @@ export const TaskRow = ({
           onClick={() => onChange(isSelected)}
         >
           <div className="col-span-1 flex items-center">
-            <Checkbox checked={isCompleted} onCheckedChange={handleComplete}/>
+            <Checkbox checked={isCompleted} onCheckedChange={handleComplete} />
           </div>
 
           <div className="col-span-7 flex items-center">
@@ -60,33 +61,35 @@ export const TaskRow = ({
 
           <div className="col-span-1 flex items-center justify-end">
             <AlertDelete
-              onConfirm={() => handleDelete(TaskId)}
+              onConfirm={() => handleDelete(TaskId ?? 0)}
               open={openAlert}
               setOpen={setOpenAlert}
             />
-            <TitikTiga
-              showAlert={() => setOpenAlert(true)}
-              handleFormValue={handleFormValue}
-              showEdit={showEdit}
-            />
+            {TaskId ? (
+              <TitikTiga
+                showAlert={() => setOpenAlert(true)}
+                handleFormValue={handleFormValue}
+                showEdit={showEdit}
+              />
+            ) : (
+              <Skeleton className="h-[25px] w-[20%]" />
+            )}
           </div>
         </div>
         <div
-          className={`${openDetails ? "h-fit px-8 pt-2" : "h-0"} overflow-hidden transition-px duration-500 flex items-center`}
+          className={`${openDetails ? "h-fit px-8 pt-2" : "h-0"} transition-px flex items-center overflow-hidden duration-500`}
         >
           <p className="text-gray-500">
-            {
-              description
-                ? description
-                : "No description"
-            }
+            {description ? description : "No description"}
           </p>
         </div>
         <div
-          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all duration-300 hover:bg-gray-400/10  ${openDetails ? " h-4" : "h-0 group-hover:h-4"}`}
+          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all duration-300 hover:bg-gray-400/10 ${openDetails ? "h-4" : "h-0 group-hover:h-4"}`}
           onClick={() => setOpenDetails(!openDetails)}
         >
-          <HiChevronDown className={`size-6 text-gray-500 ${openDetails ? "rotate-180" : "rotate-0"}`} />
+          <HiChevronDown
+            className={`size-6 text-gray-500 ${openDetails ? "rotate-180" : "rotate-0"}`}
+          />
         </div>
       </div>
     </div>

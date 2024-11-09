@@ -60,7 +60,15 @@ export const TaskTable = ({
   useEffect(() => {
     if (editedData) {
       setData((prevData) =>
-        prevData.map((task) => (task.id === editedData.id ? editedData : task)),
+        prevData.map((task) =>
+          task.id === editedData.id ||
+          (!task.id &&
+            task.title === editedData.title &&
+            task.description === editedData.description &&
+            task.deadline.toISOString() === editedData.deadline.toISOString())
+            ? editedData
+            : task,
+        ),
       );
       setEditedData(undefined);
     }
@@ -128,13 +136,11 @@ export const TaskTable = ({
 
   if (!query) {
     // console.log("loading")
-    return (
-      <TableSkeleton />
-    );
+    return <TableSkeleton />;
   }
 
   if (data.length === 0) {
-    return <h1 className="mt-[7%] mb-[3%] text-gray-600">No ongoing task.</h1>;
+    return <h1 className="mb-[3%] mt-[7%] text-gray-600">No ongoing task.</h1>;
   }
 
   return (
@@ -143,7 +149,7 @@ export const TaskTable = ({
         {/* table title */}
         <div className="mb-2 flex h-[50px] w-full items-center">
           {numSelected > 0 ? (
-            <OptionBar handleDelete={handleDeleteTasks} mark/>
+            <OptionBar handleDelete={handleDeleteTasks} mark />
           ) : (
             <h1 className="text-3xl font-bold">Your Tasks</h1>
           )}

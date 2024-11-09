@@ -17,9 +17,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { useEffect, useState, useTransition } from "react";
 import { api } from "~/trpc/react";
 import { Input } from "~/components/ui/input";
-import {
-  LocalizationProvider,
-} from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   DateCalendar,
@@ -54,7 +52,7 @@ interface CreateTaskPopUpProps {
   taskId?: number;
   userId: string;
   handleUpdate: (newTask: Task) => void;
-  handleEdit : (newTask: Task) => void;
+  handleEdit: (newTask: Task) => void;
   isOpenDialog: boolean;
   setIsOpenDialog: (value: boolean) => void;
   setUndefined: () => void;
@@ -86,9 +84,12 @@ export const CreateTaskPopUp = ({
     onMutate: (data) => {
       handleUpdate(data as Task);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data) {
+        handleEdit(data);
+      }
       setUndefined();
-    }
+    },
     // onError ntar atur
   });
 
@@ -98,7 +99,7 @@ export const CreateTaskPopUp = ({
     },
     onSuccess: () => {
       setUndefined();
-    }
+    },
   });
 
   const form = useForm<z.infer<typeof TaskSchema>>({
@@ -118,14 +119,13 @@ export const CreateTaskPopUp = ({
     });
     setSelectedDate(date ? dayjs(date) : null);
     setInputValue(date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "");
-  }, [title, description, date, form]);
-  
+  }, [title, description, date]);
+
   useEffect(() => {
     if (isCreate) {
       setUndefined();
     }
   }, [isCreate]);
-
 
   const onSubmit = (data: z.infer<typeof TaskSchema>) => {
     if (!taskId) {
@@ -141,7 +141,6 @@ export const CreateTaskPopUp = ({
     form.reset();
     setSelectedDate(null);
     setInputValue("");
-    
   };
 
   const handleDateChange = (newDate: Dayjs | null) => {
