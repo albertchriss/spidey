@@ -1,7 +1,6 @@
 import { auth } from "~/server/auth";
 import { Navbar } from "../_components/Navbar";
 import { redirect } from "next/navigation";
-import { CreateTaskPopUp } from "../_components/create/CreateTaskPopUp";
 
 export default async function Layout({
   children,

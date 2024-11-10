@@ -3,7 +3,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 export const TableSkeleton = () => {
   return (
-    <div className="mt-[60px] flex h-full w-full max-w-7xl flex-col items-center px-[3%]">
+    <div className="flex h-full w-full max-w-7xl flex-col items-center px-[3%]">
       <div className="flex w-full py-1">
         <Skeleton className="mb-2 h-[46px] w-[20%]" />
       </div>

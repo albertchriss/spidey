@@ -97,21 +97,36 @@ export const taskRouter = createTRPCRouter({
         .update(tasks)
         .set({
           ...(input.title !== undefined && { title: input.title }),
-          ...(input.description !== undefined && { description: input.description }),
+          ...(input.description !== undefined && {
+            description: input.description,
+          }),
           ...(input.deadline !== undefined && { deadline: input.deadline }),
         })
         .where(eq(tasks.id, input.id));
 
-      const updatedTask = await ctx.db.select().from(tasks).where(eq(tasks.id, input.id)).limit(1);
+      const updatedTask = await ctx.db
+        .select()
+        .from(tasks)
+        .where(eq(tasks.id, input.id))
+        .limit(1);
       return updatedTask[0] ?? null;
     }),
 
   markTask: protectedProcedure
-  .input( z.object({ id: z.number(), isCompleted: z.boolean() }))
-  .mutation(async ({ input, ctx}) => {
-    await ctx.db
-      .update(tasks)
-      .set({ isCompleted: input.isCompleted })
-      .where(eq(tasks.id, input.id));
-  })
+    .input(z.object({ id: z.number(), isCompleted: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.db
+        .update(tasks)
+        .set({ isCompleted: input.isCompleted })
+        .where(eq(tasks.id, input.id));
+    }),
+
+  markSomeTasks: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()), isCompleted: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.db
+        .update(tasks)
+        .set({ isCompleted: input.isCompleted })
+        .where(inArray(tasks.id, input.ids));
+    }),
 });

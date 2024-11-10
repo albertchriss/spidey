@@ -51,7 +51,7 @@ interface CreateTaskPopUpProps {
   date?: Date;
   taskId?: number;
   userId: string;
-  handleUpdate: (newTask: Task) => void;
+  handleUpdate: (newTask: Task[]) => void;
   handleEdit: (newTask: Task) => void;
   isOpenDialog: boolean;
   setIsOpenDialog: (value: boolean) => void;
@@ -70,19 +70,21 @@ export const CreateTaskPopUp = ({
   setIsOpenDialog,
   setUndefined,
 }: CreateTaskPopUpProps) => {
+
+  // state
   const [isCreate, setIsCreate] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
     date ? dayjs(date) : null,
   );
-
   const [inputValue, setInputValue] = useState(
     selectedDate ? selectedDate.format("DD/MM/YYYY HH:mm") : "",
   );
 
+  // mutation functions
   const { mutate: createTask } = api.task.createTask.useMutation({
     onMutate: (data) => {
-      handleUpdate(data as Task);
+      handleUpdate([data as Task]);
     },
     onSuccess: (data) => {
       if (data) {
@@ -92,7 +94,6 @@ export const CreateTaskPopUp = ({
     },
     // onError ntar atur
   });
-
   const { mutate: updateTask } = api.task.updateTask.useMutation({
     onMutate: (data) => {
       handleEdit(data as Task);
@@ -102,6 +103,7 @@ export const CreateTaskPopUp = ({
     },
   });
 
+  // form
   const form = useForm<z.infer<typeof TaskSchema>>({
     resolver: zodResolver(TaskSchema),
     defaultValues: {
@@ -111,6 +113,7 @@ export const CreateTaskPopUp = ({
     },
   });
 
+  // handle use effect
   useEffect(() => {
     form.reset({
       title: title ?? "",
@@ -120,13 +123,13 @@ export const CreateTaskPopUp = ({
     setSelectedDate(date ? dayjs(date) : null);
     setInputValue(date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "");
   }, [title, description, date]);
-
   useEffect(() => {
     if (isCreate) {
       setUndefined();
     }
   }, [isCreate]);
 
+  // functions
   const onSubmit = (data: z.infer<typeof TaskSchema>) => {
     if (!taskId) {
       startTransition(() => {

@@ -4,7 +4,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import { HiChevronDown } from "react-icons/hi";
 
 interface AccordionDropdownProps {
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }

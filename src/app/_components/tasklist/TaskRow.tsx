@@ -43,23 +43,23 @@ export const TaskRow = ({
   return (
     <div className="h-fit w-full">
       <div className="group flex h-fit w-full flex-col overflow-hidden border-b border-gray-400 transition-all">
-        <div
+        <ul
           className={`z-10 grid w-full grid-cols-12 gap-2 rounded-md px-4 py-2 transition-all duration-300 ${!isSelected ? "bg-white" : "bg-slate-100"}`}
           onClick={() => onChange(isSelected)}
         >
-          <div className="col-span-1 flex items-center">
+          <li className="col-span-1 flex items-center">
             <Checkbox checked={isCompleted} onCheckedChange={handleComplete} />
-          </div>
+          </li>
 
-          <div className="col-span-7 flex items-center">
+          <li className="col-span-7 flex items-center">
             <p className="flex-grow hover:cursor-default">{children}</p>
-          </div>
+          </li>
 
-          <div className="col-span-3 flex items-center">
+          <li className="col-span-3 flex items-center">
             <p>{date.toLocaleString().slice(0, 17)}</p>
-          </div>
+          </li>
 
-          <div className="col-span-1 flex items-center justify-end">
+          <li className="col-span-1 flex items-center justify-end">
             <AlertDelete
               onConfirm={() => handleDelete(TaskId ?? 0)}
               open={openAlert}
@@ -74,17 +74,18 @@ export const TaskRow = ({
             ) : (
               <Skeleton className="h-[25px] w-[20%]" />
             )}
-          </div>
-        </div>
+          </li>
+        </ul>
         <div
-          className={`${openDetails ? "h-fit px-8 pt-2" : "h-0"} transition-px flex items-center overflow-hidden duration-500`}
+          className={`${openDetails ? "h-fit px-8 pt-2" : "h-0"} transition-px flex items-center overflow-hidden duration-500 bg-white`}
         >
-          <p className="text-gray-500">
+          <p className={`text-gray-500 ${description ? "" : "italic"}`}>
             {description ? description : "No description"}
           </p>
         </div>
+        
         <div
-          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all duration-300 hover:bg-gray-400/10 ${openDetails ? "h-4" : "h-0 group-hover:h-4"}`}
+          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all bg-white duration-300 hover:bg-gray-400/10 ${openDetails ? "h-4" : "h-0 group-hover:h-4"}`}
           onClick={() => setOpenDetails(!openDetails)}
         >
           <HiChevronDown

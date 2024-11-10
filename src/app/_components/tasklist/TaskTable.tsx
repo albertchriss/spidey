@@ -5,12 +5,11 @@ import { TaskHeader } from "./TaskHeader";
 import { OptionBar } from "~/app/_components/tasklist/OptionBar";
 import { api } from "~/trpc/react";
 import { Task } from "~/server/db/schema";
-import { Skeleton } from "~/components/ui/skeleton";
 import { TableSkeleton } from "./TableSkeleton";
 
 interface TaskTableProps {
   userId: string;
-  updatedData?: Task;
+  updatedData?: Task[];
   editedData?: Task;
   handleFormValue: (
     title: string,
@@ -18,9 +17,10 @@ interface TaskTableProps {
     date: Date,
     taskId: number,
   ) => void;
-  setUpdatedData: (newTask: Task | undefined) => void;
+  setUpdatedData: (newTask: Task[]) => void;
   setEditedData: (newTask: Task | undefined) => void;
-  setCompletedData: (newTask: Task | undefined) => void;
+  setCompletedData: (newTask: Task[]) => void;
+  setNumOngoing: (value: number) => void;
 }
 
 export const TaskTable = ({
@@ -31,29 +31,68 @@ export const TaskTable = ({
   setUpdatedData,
   setEditedData,
   setCompletedData,
+  setNumOngoing,
 }: TaskTableProps) => {
-  // state stuff
+  // state 
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [numSelected, setNumSelected] = useState(0);
   const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
   const [data, setData] = useState<Task[]>([]);
 
-  // query stuff
+  // query 
   const { data: query } = api.task.getUserTasks.useQuery({
     id: userId,
     completed: false,
   });
-
+  
+  // mutation stuff
+  const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({
+    onMutate: (variables) => {
+      const taskIds = variables.ids;
+      setData(data?.filter((task) => !taskIds.includes(task.id)));
+      setSelectedTasks(selectedTasks.filter((id) => !taskIds.includes(id)));
+    },
+  });
+  const { mutate: deleteTask } = api.task.deleteTask.useMutation({
+    onMutate: (variables) => {
+      const taskId = variables.id;
+      setData(data?.filter((task) => task.id !== taskId));
+      setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
+    },
+  });
+  const { mutate: completeTask } = api.task.markTask.useMutation({
+    onMutate: (variables) => {
+      const taskId = variables.id;
+      setCompletedData(data?.filter((task) => task.id === taskId));
+      setData(data?.filter((task) => task.id !== taskId));
+      setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
+    },
+  });
+  const { mutate: completeSomeTask } = api.task.markSomeTasks.useMutation({
+    onMutate: (variables) => {
+      const taskIds = variables.ids;
+      setCompletedData(data?.filter((task) => taskIds.includes(task.id)));
+      setData(data?.filter((task) => !taskIds.includes(task.id)));
+      setSelectedTasks(selectedTasks.filter((id) => !taskIds.includes(id)));
+    }
+  })
+  
+  // useeffect
   useEffect(() => {
     if (query) {
       setData(query);
     }
   }, [query]);
-
+  
   useEffect(() => {
-    if (updatedData) {
-      setData((prevData) => [...prevData, updatedData]);
-      setUpdatedData(undefined);
+    if (query)
+      setNumOngoing(data.length);
+  }, [query, data])
+  
+  useEffect(() => {
+    if (updatedData && updatedData.length > 0) {
+      setData((prevData) => [...prevData, ...updatedData]);
+      setUpdatedData([]);
     }
   }, [updatedData]);
 
@@ -83,31 +122,9 @@ export const TaskTable = ({
     }
   }, [selectedTasks, data]);
 
-  // mutation stuff
-  const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({
-    onMutate: (variables) => {
-      const taskIds = variables.ids;
-      setData(data?.filter((task) => !taskIds.includes(task.id)));
-      setSelectedTasks(selectedTasks.filter((id) => !taskIds.includes(id)));
-    },
-  });
-  const { mutate: deleteTask } = api.task.deleteTask.useMutation({
-    onMutate: (variables) => {
-      const taskId = variables.id;
-      setData(data?.filter((task) => task.id !== taskId));
-      setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
-    },
-  });
-  const { mutate: completeTask } = api.task.markTask.useMutation({
-    onMutate: (variables) => {
-      const taskId = variables.id;
-      setCompletedData(data?.find((task) => task.id === taskId));
-      setData(data?.filter((task) => task.id !== taskId));
-      setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
-    },
-  });
 
-  // functions stuff
+
+  // functions
   const handleSelectAll = () => {
     if (isSelectedAll) {
       setSelectedTasks([]);
@@ -129,27 +146,29 @@ export const TaskTable = ({
   const handleDeleteOneTask = (taskId: number) => {
     deleteTask({ id: taskId });
   };
-
-  const handleComplete = (taskId: number) => {
+  const handleCompleteTasks = () => {
+    completeSomeTask({ ids: selectedTasks, isCompleted: true });
+    setSelectedTasks([]);
+  }
+  const handleCompleteOneTask = (taskId: number) => {
     completeTask({ id: taskId, isCompleted: true });
   };
 
   if (!query) {
-    // console.log("loading")
     return <TableSkeleton />;
   }
 
   if (data.length === 0) {
-    return <h1 className="mb-[3%] mt-[7%] text-gray-600">No ongoing task.</h1>;
+    return <h1 className="italic text-gray-600">No ongoing task.</h1>;
   }
 
   return (
-    <div className="mt-[60px] flex h-full w-full max-w-7xl flex-col items-center overflow-auto px-[3%]">
+    <div className="flex h-full w-full max-w-7xl flex-col items-center overflow-auto px-[3%]">
       <div className="flex w-full flex-col items-center">
         {/* table title */}
         <div className="mb-2 flex h-[50px] w-full items-center">
           {numSelected > 0 ? (
-            <OptionBar handleDelete={handleDeleteTasks} mark />
+            <OptionBar handleDelete={handleDeleteTasks} mark handleCompleteTasks={handleCompleteTasks}/>
           ) : (
             <h1 className="text-3xl font-bold">Your Tasks</h1>
           )}
@@ -185,7 +204,7 @@ export const TaskTable = ({
                   items.id,
                 )
               }
-              handleComplete={() => handleComplete(items.id)}
+              handleComplete={() => handleCompleteOneTask(items.id)}
             >
               {items.title}
             </TaskRow>

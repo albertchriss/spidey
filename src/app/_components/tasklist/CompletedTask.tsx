@@ -5,15 +5,14 @@ import { TaskHeader } from "./TaskHeader";
 import { OptionBar } from "~/app/_components/tasklist/OptionBar";
 import { api } from "~/trpc/react";
 import { Task } from "~/server/db/schema";
-import { Skeleton } from "~/components/ui/skeleton";
 import { TableSkeleton } from "./TableSkeleton";
 
 interface TaskTableProps {
   userId: string;
-  completedData?: Task;
+  completedData?: Task[];
   handleFormValue: (title: string, description: string, date: Date, taskId: number) => void;
-  setUpdatedData: (newTask: Task | undefined) => void;
-  setCompletedData: (newTask: Task | undefined) => void;
+  setUpdatedData: (newTask: Task[]) => void;
+  setCompletedData: (newTask: Task[]) => void;
   setNumCompleted: (num: number) => void;
 }
 
@@ -36,35 +35,6 @@ export const CompletedTask = ({
     id: userId,
     completed: true,
   });
-
-  useEffect(() => {
-    if (query) {
-      setData(query);
-    }
-  }, [query]);
-
-  useEffect(() => {
-    if (completedData) {
-      setData((prevData) => [...prevData, completedData]);
-      setCompletedData(undefined);
-      setIsSelectedAll(false);
-    }
-  }, [completedData]);
-
-  useEffect(() => {
-    setNumSelected(selectedTasks.length);
-    if (selectedTasks.length === data.length){
-      setIsSelectedAll(true);
-    }
-    else{
-      setIsSelectedAll(false)
-    }
-  }, [selectedTasks, data]);
-
-  useEffect(() => {
-    setNumCompleted(data.length);
-  }, [data])
-
   // mutation stuff
   const { mutate: deleteSomeTasks } = api.task.deleteSomeTasks.useMutation({
     onMutate: (variables) => {
@@ -85,9 +55,48 @@ export const CompletedTask = ({
       const taskId = variables.id;
       setData(data?.filter((task) => task.id !== taskId));
       setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
-      setUpdatedData(data?.find((task) => task.id === taskId));
+      setUpdatedData(data?.filter((task) => task.id === taskId));
     },
   })
+  const { mutate: unCompleteSomeTask } = api.task.markSomeTasks.useMutation({
+    onMutate: (variables) => {
+      const taskIds = variables.ids;
+      setData(data?.filter((task) => !taskIds.includes(task.id)));
+      setSelectedTasks(selectedTasks.filter((id) => !taskIds.includes(id)));
+      setUpdatedData(data?.filter((task) => taskIds.includes(task.id)));
+    }
+  })
+
+  useEffect(() => {
+    if (query) {
+      setData(query);
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (query)
+      setNumCompleted(data.length);
+  }, [query, data])
+
+  useEffect(() => {
+    if (completedData && completedData.length > 0) {
+      setData((prevData) => [...prevData, ...completedData]);
+      setCompletedData([]);
+    }
+  }, [completedData]);
+
+  useEffect(() => {
+    setNumSelected(selectedTasks.length);
+    if (selectedTasks.length === data.length){
+      setIsSelectedAll(true);
+    }
+    else{
+      setIsSelectedAll(false)
+    }
+  }, [selectedTasks, data]);
+
+  
+
 
   // functions stuff
   const handleSelectAll = () => {
@@ -111,10 +120,14 @@ export const CompletedTask = ({
   const handleDeleteOneTask = (taskId: number) => {
     deleteTask({ id: taskId });
   };
-
-  const handleComplete = (taskId: number) => {
+  const handleCompleteTasks = () => {
+    unCompleteSomeTask({ ids: selectedTasks, isCompleted: false });
+    setSelectedTasks([])
+  }
+  const handleCompleteOneTask = (taskId: number) => {
     uncompleteTask({ id: taskId, isCompleted: false }); 
   }
+  
 
   if (!query) {
     return (
@@ -124,7 +137,7 @@ export const CompletedTask = ({
 
   if (data.length === 0) {
     return (
-        <h1>No completed task.</h1>
+        <h1 className="italic">No completed task.</h1>
     )
   }
 
@@ -135,7 +148,7 @@ export const CompletedTask = ({
           {/* table title */}
           <div className="mb-2 flex h-[50px] w-full items-center">
             {numSelected > 0 ? (
-              <OptionBar handleDelete={handleDeleteTasks} />
+              <OptionBar handleDelete={handleDeleteTasks} handleCompleteTasks={handleCompleteTasks}/>
             ) : (
               <h1 className="text-3xl font-bold">Completed Tasks</h1>
             )}
@@ -170,7 +183,7 @@ export const CompletedTask = ({
                     items.id,
                   )
                 }
-                handleComplete={() => handleComplete(items.id)}
+                handleComplete={() => handleCompleteOneTask(items.id)}
               >
                 {items.title}
               </TaskRow>
