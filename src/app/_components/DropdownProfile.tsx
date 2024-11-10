@@ -1,5 +1,3 @@
-"use client"
-import { signOut } from "next-auth/react"
 
 import {
   DropdownMenu,
@@ -12,6 +10,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import Image from "next/image";
+import { SignOutButton } from "./SignOutButton";
 
 interface DropdownProfileProps {
     src: string;
@@ -19,11 +18,6 @@ interface DropdownProfileProps {
 }
 
 export const DropdownProfile = ({src, email}: DropdownProfileProps) => {
-    const handleOnClick = () => {
-        signOut({
-            callbackUrl: "/"
-        })
-    }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -37,7 +31,7 @@ export const DropdownProfile = ({src, email}: DropdownProfileProps) => {
       <DropdownMenuContent className="">
         <DropdownMenuLabel className="mx-4 my-2">{email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleOnClick}>Sign Out</DropdownMenuItem>
+        <DropdownMenuItem><SignOutButton /></DropdownMenuItem>
         <DropdownMenuItem>Billing</DropdownMenuItem>
         <DropdownMenuItem>Team</DropdownMenuItem>
         <DropdownMenuItem>Subscription</DropdownMenuItem>

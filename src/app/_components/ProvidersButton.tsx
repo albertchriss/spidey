@@ -1,18 +1,17 @@
-"use client"
 
 import { Button } from "~/components/ui/button";
-import { signIn } from "next-auth/react"
+import { signIn } from "~/server/auth";
 
 interface ProvidersButtonProps {
     provider: string;
 }
 export const ProvidersButton = ({provider} : ProvidersButtonProps) => {
-    const onClick = (provider: string) => {
-        signIn(provider, {
-            callbackUrl: "/tasklist"
-        })
-    }
     return (
-        <Button size="lg" onClick={() => onClick(provider)}>Sign In</Button>
+        <form action={async () => {
+            "use server"
+            await signIn(provider, {redirectTo: "/tasklist"})
+        }}>
+            <Button size="lg" type="submit">Sign In</Button>
+        </form>
     )
 }

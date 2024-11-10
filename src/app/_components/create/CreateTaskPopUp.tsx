@@ -7,7 +7,6 @@ import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -151,8 +150,8 @@ export const CreateTaskPopUp = ({
       // Retain the time from the previous date, only update the date
       const newDateValue = newDate
         ? newDate
-            .set("hour", prev?.hour() || 0)
-            .set("minute", prev?.minute() || 0)
+            .set("hour", prev?.hour() ?? 0)
+            .set("minute", prev?.minute() ?? 0)
         : null;
 
       setInputValue(
@@ -169,7 +168,7 @@ export const CreateTaskPopUp = ({
     setSelectedDate((prev) => {
       // Retain the date from the previous selection, only update the time
       const newTimeValue = newTime
-        ? prev?.set("hour", newTime.hour()).set("minute", newTime.minute()) ||
+        ? prev?.set("hour", newTime.hour()).set("minute", newTime.minute()) ??
           null
         : null;
 

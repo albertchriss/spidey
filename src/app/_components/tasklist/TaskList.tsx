@@ -56,6 +56,7 @@ export const TaskList = ({ userId }: TaskList) => {
   return (
     <>
       <AccordionDropdown
+        defaultExpanded
         title={
           <span>
             Ongoing Task {"("}{numOngoing === undefined ? <Skeleton className="size-[14px] rounded-full inline-block"/> : `${numOngoing}`}{")"}

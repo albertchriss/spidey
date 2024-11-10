@@ -14,7 +14,6 @@ import {
   verificationTokens,
 } from "~/server/db/schema";
 
-import { api } from "~/trpc/server"
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -41,7 +40,7 @@ declare module "next-auth" {
 export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({token, user}){
-      if (user && user.image){
+      if (user?.image){
         token.image = user.image;
       }
       return token;

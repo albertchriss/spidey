@@ -7,15 +7,17 @@ interface AccordionDropdownProps {
   title: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  defaultExpanded?: boolean;
 }
 
 export const AccordionDropdown = ({
   title,
   children,
   className,
+  defaultExpanded
 }: AccordionDropdownProps) => {
   return (
-    <Accordion className={className}>
+    <Accordion className={className} defaultExpanded={defaultExpanded}>
       <AccordionSummary
         expandIcon={<HiChevronDown />}
       >

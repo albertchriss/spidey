@@ -1,11 +1,9 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
-import { varchar } from "drizzle-orm/pg-core";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import {
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
 } from "~/server/api/trpc";
 import { auth } from "~/server/auth";
 import { tasks } from "~/server/db/schema";
