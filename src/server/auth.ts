@@ -60,6 +60,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }) as Adapter,
+  pages: {
+    signIn: "/",
+  },
   session:{
     strategy : "jwt",
   },

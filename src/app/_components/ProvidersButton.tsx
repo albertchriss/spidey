@@ -6,10 +6,8 @@ import { Button } from "~/components/ui/button";
 export const ProvidersButton = () => {
   
   return (
-    <form onSubmit={handleSignIn}>
-      <Button size="lg" type="submit">
+      <Button size="lg" onClick={() => handleSignIn()}>
         Sign In
       </Button>
-    </form>
   );
 };
