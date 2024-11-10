@@ -27,6 +27,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { PopUp } from "../PopUp";
 import type { Task } from "~/server/db/schema";
 import { HiOutlinePlus, HiPlus } from "react-icons/hi";
+import { CreateButton } from "../sidebar/CreateButton";
 
 const slotProps: TimeClockSlotProps = {
   leftArrowIcon: { fontSize: "large" },
@@ -197,9 +198,14 @@ export const CreateTaskPopUp = ({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <PopUp
-        title={`${taskId ? "Edit" : "Create"} a Task`}
-        trigger={<HiPlus className="text-3xl" />}
+      <CreateButton
+        title={`${taskId ? "Edit" : "Create"} a task`}
+        trigger={
+          <span className="items-center flex h-full gap-3">
+            Create Task
+            <HiPlus className="inline-block text-lg font-bold" />
+          </span>
+        }
         description="Define the task title, description (optional), and deadline"
         isOpen={isOpenDialog}
         setIsOpen={setIsOpenDialog}
@@ -289,7 +295,7 @@ export const CreateTaskPopUp = ({
             </Button>
           </form>
         </Form>
-      </PopUp>
+      </CreateButton>
     </LocalizationProvider>
   );
 };

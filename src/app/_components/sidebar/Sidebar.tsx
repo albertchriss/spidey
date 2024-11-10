@@ -16,15 +16,17 @@ import {
 } from "~/components/ui/sidebar";
 import { DropdownProfile } from "./DropdownProfile";
 import { MenuTab } from "./MenuTab";
+import { CreateTab } from "./CreateTab";
 
 
 
 interface AppSidebarProps {
   src: string;
   email: string;
+  userId: string;
 }
 
-export const AppSidebar = ({ src, email }: AppSidebarProps) => {
+export const AppSidebar = ({ src, email, userId }: AppSidebarProps) => {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -35,6 +37,7 @@ export const AppSidebar = ({ src, email }: AppSidebarProps) => {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="px-2">
+        <CreateTab userId={userId} />
         <MenuTab />
       </SidebarContent>
       <SidebarFooter>

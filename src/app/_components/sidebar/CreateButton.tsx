@@ -52,13 +52,13 @@ export function CreateButton({
         <SidebarMenu>
           <SidebarMenuItem>
             <Dialog open={isOpen} onOpenChange={onOpenChange}>
-              <SidebarMenuButton asChild>
+              {/* <SidebarMenuButton className="hover:bg-none" asChild> */}
                 <DialogTrigger asChild>
-                  <Button className="" onClick={handleTrigger}>
+                  <Button variant={"default"} onClick={handleTrigger} className="w-full">
                     {trigger}
                   </Button>
                 </DialogTrigger>
-              </SidebarMenuButton>
+              {/* </SidebarMenuButton> */}
                 <DialogContent className="w-[80%] max-w-[80%]">
                   <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>

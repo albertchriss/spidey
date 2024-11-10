@@ -1,5 +1,6 @@
+"use client"
 import Link from "next/link";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { IoCalendar } from "react-icons/io5";
 import { FaTasks } from "react-icons/fa";
 import {
   SidebarGroup,
@@ -9,11 +10,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { usePathname } from "next/navigation";
 const navLinks = [
   {
     name: "Calendar",
     route: "/calendar",
-    icon: ChevronDownIcon,
+    icon: IoCalendar,
   },
   {
     name: "Task",
@@ -22,6 +24,7 @@ const navLinks = [
   },
 ];
 export const MenuTab = () => {
+  const pathname = usePathname();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Menu</SidebarGroupLabel>
@@ -29,7 +32,7 @@ export const MenuTab = () => {
         <SidebarMenu>
           {navLinks.map((route, index) => (
             <SidebarMenuItem key={index}>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild  className={`${route.route === pathname ? "bg-gray-200 hover:bg-gray-300" : ""}`}>
                 <Link href={route.route} className="gap-4">
                   <route.icon />
                   <span className="">{route.name}</span>

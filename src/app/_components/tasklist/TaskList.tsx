@@ -3,23 +3,42 @@
 import { useState } from "react";
 import { CreateTaskPopUp } from "../create/CreateTaskPopUp";
 import { TaskTable } from "./TaskTable";
-import { Task } from "~/server/db/schema";
+import type { Task } from "~/server/db/schema";
 import { CompletedTask } from "./CompletedTask";
 import { AccordionDropdown } from "../AccordionDropdown";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useTaskContext } from "./TaskContext";
 
 interface TaskList {
   userId?: string;
 }
 
 export const TaskList = ({ userId }: TaskList) => {
-  const [isOpenDialog, setIsOpenDialog] = useState(false);
-  const [title, setTitle] = useState<string | undefined>();
-  const [description, setDescription] = useState<string | undefined>();
-  const [date, setDate] = useState<Date | undefined>();
-  const [taskId, setTaskId] = useState<number | undefined>();
-  const [numCompleted, setNumCompleted] = useState<number | undefined>();
-  const [numOngoing, setNumOngoing] = useState<number | undefined>();
+  // const [isOpenDialog, setIsOpenDialog] = useState(false);
+  // const [title, setTitle] = useState<string | undefined>();
+  // const [description, setDescription] = useState<string | undefined>();
+  // const [date, setDate] = useState<Date | undefined>();
+  // const [taskId, setTaskId] = useState<number | undefined>();
+  // const [numCompleted, setNumCompleted] = useState<number | undefined>();
+  // const [numOngoing, setNumOngoing] = useState<number | undefined>();
+  const {
+    // handleFormValue,
+    updatedData,
+    setUpdatedData,
+    editedData,
+    setEditedData,
+    completedData,
+    setCompletedData,
+    numCompleted,
+    setNumCompleted,
+    numOngoing,
+    setNumOngoing,
+    setIsOpenDialog,
+    setTitle,
+    setDescription,
+    setDate,
+    setTaskId
+  } = useTaskContext();
 
   const handleFormValue = (
     title: string,
@@ -41,28 +60,42 @@ export const TaskList = ({ userId }: TaskList) => {
     setTaskId(undefined);
   };
 
-  const [updatedData, setUpdatedData] = useState<Task[]>();
   const handleUpdateData = (newTask: Task[]) => {
     setUpdatedData(newTask);
   };
 
-  const [editedData, setEditedData] = useState<Task | undefined>();
   const handleEditData = (newTask: Task) => {
     setEditedData(newTask);
   };
 
-  const [completedData, setCompletedData] = useState<Task[]>();
+
+  // export const Create = () => {
+  //   return (
+  //     <CreateTaskPopUp
+  //       userId={userId ?? ""}
+  //       handleUpdate={handleUpdateData}
+  //       handleEdit={handleEditData}
+  //       isOpenDialog={isOpenDialog}
+  //       setIsOpenDialog={setIsOpenDialog}
+  //       title={title}
+  //       description={description}
+  //       date={date}
+  //       taskId={taskId}
+  //       setUndefined={setUndefined}
+  //     />
+  //   )
+  // }
 
   return (
     <>
       <AccordionDropdown
         defaultExpanded
         title={
-          <span>
+          <span className="font-semibold">
             Ongoing Task {"("}{numOngoing === undefined ? <Skeleton className="size-[14px] rounded-full inline-block"/> : `${numOngoing}`}{")"}
           </span>
         }
-        className="h-full w-[90%] max-w-7xl bg-gray-100/50"
+        className="h-full w-[90%] max-w-7xl bg-gray-100 bg-opacity-50"
       >
         <TaskTable
           userId={userId ?? ""}
@@ -78,11 +111,11 @@ export const TaskList = ({ userId }: TaskList) => {
 
       <AccordionDropdown
         title={
-          <span>
+          <span className="font-semibold">
             Completed Task {"("}{numCompleted === undefined ? <Skeleton className="size-[14px] rounded-full inline-block"/> : `${numCompleted}`}{")"}
           </span>
         }
-        className="h-full w-[90%] max-w-7xl bg-gray-100/50"
+        className="h-full w-[90%] max-w-7xl bg-gray-100 bg-opacity-50"
       >
         <CompletedTask
           userId={userId ?? ""}
@@ -94,18 +127,7 @@ export const TaskList = ({ userId }: TaskList) => {
         />
       </AccordionDropdown>
 
-      <CreateTaskPopUp
-        userId={userId ?? ""}
-        handleUpdate={handleUpdateData}
-        handleEdit={handleEditData}
-        isOpenDialog={isOpenDialog}
-        setIsOpenDialog={setIsOpenDialog}
-        title={title}
-        description={description}
-        date={date}
-        taskId={taskId}
-        setUndefined={setUndefined}
-      />
+      
     </>
   );
 };

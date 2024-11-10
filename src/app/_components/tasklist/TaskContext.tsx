@@ -1,4 +1,4 @@
-// TaskContext.tsx
+"use client"
 import { createContext, useContext, useState, ReactNode } from "react";
 import type { Task } from "~/server/db/schema";
 
@@ -19,7 +19,7 @@ interface TaskContextType {
   setDate: (date?: Date) => void;
   setTaskId: (taskId?: number) => void;
   setUpdatedData: (tasks: Task[]) => void;
-  setEditedData: (task: Task) => void;
+  setEditedData: (task: Task | undefined) => void;
   setCompletedData: (tasks: Task[]) => void;
   setNumCompleted: (count: number) => void;
   setNumOngoing: (count: number) => void;
