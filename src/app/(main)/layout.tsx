@@ -1,6 +1,7 @@
 import { auth } from "~/server/auth";
-import { Navbar } from "../_components/Navbar";
 import { redirect } from "next/navigation";
+import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { AppSidebar } from "../_components/sidebar/Sidebar";
 
 export default async function Layout({
   children,
@@ -14,9 +15,12 @@ export default async function Layout({
     redirect("/");
   }
   return (
-    <div className="relative flex min-h-screen w-full min-w-fit flex-col items-center overflow-hidden">
-      <Navbar src={imgsrc ?? "/default-pp.svg"} email={email ?? ""} />
-      {children}
-    </div>
+    <main className="relative flex min-h-screen w-full min-w-fit items-center overflow-hidden">
+      <SidebarProvider>
+        <AppSidebar src={imgsrc ?? ""} email={email ?? ""} />
+        {/* <Navbar src={imgsrc ?? "/default-pp.svg"} email={email ?? ""} /> */}
+        {children}
+      </SidebarProvider>
+    </main>
   );
 }

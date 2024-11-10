@@ -122,6 +122,10 @@ export const TaskTable = ({
     }
   }, [selectedTasks, data]);
 
+  useEffect(() => {
+    setData((prev) => [...prev].sort((a, b) => a.deadline.getTime() - b.deadline.getTime()));
+  }, [query, updatedData, editedData]);
+
 
 
   // functions

@@ -5,6 +5,7 @@ import { TitikTiga } from "./TitikTiga";
 import { HiChevronDown } from "react-icons/hi";
 import { AlertDelete } from "../AlertDelete";
 import { Skeleton } from "~/components/ui/skeleton";
+import dayjs from "dayjs";
 
 interface TaskRowProps {
   children: React.ReactNode;
@@ -56,7 +57,7 @@ export const TaskRow = ({
           </li>
 
           <li className="col-span-3 flex items-center">
-            <p>{date.toLocaleString().slice(0, 17)}</p>
+            <p className={(date < new Date()) && !isCompleted ? "text-red-700" : ""}>{dayjs(date).format('DD/MM/YYYY HH:mm')}</p>
           </li>
 
           <li className="col-span-1 flex items-center justify-end">
@@ -85,7 +86,7 @@ export const TaskRow = ({
         </div>
         
         <div
-          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all bg-white duration-300 hover:bg-gray-400/10 ${openDetails ? "h-4" : "h-0 group-hover:h-4"}`}
+          className={`z-0 flex items-center justify-center rounded-md border-b-gray-800 transition-all bg-white duration-300 hover:bg-slate-100 ${openDetails ? "h-4" : "h-0 group-hover:h-4"}`}
           onClick={() => setOpenDetails(!openDetails)}
         >
           <HiChevronDown

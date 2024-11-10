@@ -5,15 +5,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "~/components/ui/dialog";
 
 interface PopUpProps {
-  trigger: string;
+  trigger: React.ReactNode;
   title: string;
   description: string;
   children: React.ReactNode;
@@ -46,7 +44,7 @@ export function PopUp({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button
-          className="absolute bottom-[2%] right-[2%] flex size-12 items-center justify-center rounded-full text-4xl"
+          className="absolute bottom-[2%] right-[2%] flex size-12 items-center justify-center rounded-full p-0"
           onClick={handleTrigger}
         >
           {trigger}

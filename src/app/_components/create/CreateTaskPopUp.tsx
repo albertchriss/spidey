@@ -25,7 +25,8 @@ import {
 } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { PopUp } from "../PopUp";
-import { Task } from "~/server/db/schema";
+import type { Task } from "~/server/db/schema";
+import { HiOutlinePlus, HiPlus } from "react-icons/hi";
 
 const slotProps: TimeClockSlotProps = {
   leftArrowIcon: { fontSize: "large" },
@@ -197,8 +198,8 @@ export const CreateTaskPopUp = ({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <PopUp
-        title="Create A Task"
-        trigger="+"
+        title={`${taskId ? "Edit" : "Create"} a Task`}
+        trigger={<HiPlus className="text-3xl" />}
         description="Define the task title, description (optional), and deadline"
         isOpen={isOpenDialog}
         setIsOpen={setIsOpenDialog}

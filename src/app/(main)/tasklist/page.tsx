@@ -6,7 +6,7 @@ const TaskListPage = async () => {
 
   const userId = session?.user.id;
   return (
-    <div className="font-inter flex h-full w-full flex-col items-center pt-20 gap-5">
+    <div className="flex h-full w-full flex-col items-center py-10 gap-5">
       <TaskList userId={userId} />
     </div>
   );

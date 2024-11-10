@@ -94,7 +94,9 @@ export const CompletedTask = ({
       setIsSelectedAll(false)
     }
   }, [selectedTasks, data]);
-
+  useEffect(() => {
+    setData((prev) => [...prev].sort((a, b) => a.deadline.getTime() - b.deadline.getTime()));
+  }, [query, completedData]);
   
 
 

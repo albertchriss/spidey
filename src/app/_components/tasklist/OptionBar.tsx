@@ -34,7 +34,7 @@ export const OptionBar = ({
             :
             <HiXCircle className="size-6 text-red-400" />
           }
-          <p className={`text-${ mark ? "grean" : "red"}-700`}>
+          <p className={`${ mark ? "text-green-700" : "text-red-700"}`}>
             {
               mark ?
               "Mark as completed"

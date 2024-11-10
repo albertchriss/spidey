@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { IoMenuOutline } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
-import { DropdownProfile } from "./DropdownProfile";
+import { DropdownProfile } from "./sidebar/DropdownProfile";
 
 const navLinks = [
   {
@@ -45,7 +45,7 @@ export const Navbar = ({ src, email }: NavbarProps) => {
   return (
     <div className="fixed top-0 z-30 h-fit w-full border-b border-zinc-300 bg-zinc-100">
       <div className="flex h-full w-full items-center justify-between gap-2 px-10 py-2">
-        <DropdownProfile src={src} email={email}/>
+        <DropdownProfile src={src} email={email} />
         <div className="my-auto">
           <nav className="hidden gap-10 md:flex">
             {navLinks.map((route) => (
