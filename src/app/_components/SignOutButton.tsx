@@ -1,12 +1,14 @@
-"use server"
-import { signOut } from "~/server/auth"
+"use client"; 
+
+import { handleSignOut } from "~/actions";
+import { Button } from "~/components/ui/button";
 
 export const SignOutButton = () => {
-    return (
-        <form action={async () => {
-            await signOut({redirectTo: "/"})
-        }}>
-            <button type="submit">Sign Out</button>
-        </form>
-    )
-}
+  
+
+  return (
+    <form onSubmit={handleSignOut}>
+      <Button type="submit">Sign Out</Button>
+    </form>
+  );
+};

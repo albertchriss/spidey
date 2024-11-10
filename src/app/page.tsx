@@ -19,7 +19,7 @@ const LandingPage = async () => {
         </p>
       </div>
       {/* <Link href="/api/auth/signIn"> */}
-      <ProvidersButton provider='google'/>
+      <ProvidersButton/>
       {/* </Link> */}
     </div>
   )
