@@ -16,14 +16,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { useTaskContext } from "../tasklist/TaskContext";
 
 interface CreateButtonProps {
   trigger: React.ReactNode;
   title: string;
   description: string;
   children: React.ReactNode;
-  isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
   setIsCreate: (value: boolean) => void;
 }
 
@@ -32,18 +31,22 @@ export function CreateButton({
   title,
   description,
   children,
-  isOpen,
-  setIsOpen,
-  setIsCreate,
+  setIsCreate
 }: CreateButtonProps) {
+
+  const {
+    isOpenDialog,
+    setIsOpenDialog,
+  } = useTaskContext();
+
   const onOpenChange = () => {
-    setIsOpen(!isOpen);
-    if (isOpen) {
+    setIsOpenDialog(!isOpenDialog);
+    if (isOpenDialog) {
       setIsCreate(false);
     }
   };
   const handleTrigger = () => {
-    setIsOpen(true);
+    setIsOpenDialog(true);
     setIsCreate(true);
   };
   return (
@@ -51,14 +54,12 @@ export function CreateButton({
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Dialog open={isOpen} onOpenChange={onOpenChange}>
-              {/* <SidebarMenuButton className="hover:bg-none" asChild> */}
+            <Dialog open={isOpenDialog} onOpenChange={onOpenChange}>
                 <DialogTrigger asChild>
                   <Button variant={"default"} onClick={handleTrigger} className="w-full">
                     {trigger}
                   </Button>
                 </DialogTrigger>
-              {/* </SidebarMenuButton> */}
                 <DialogContent className="w-[80%] max-w-[80%]">
                   <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
