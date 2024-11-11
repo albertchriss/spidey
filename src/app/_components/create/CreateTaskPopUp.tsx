@@ -24,9 +24,8 @@ import {
   TimeClockSlotProps,
 } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { PopUp } from "../PopUp";
 import type { Task } from "~/server/db/schema";
-import { HiOutlinePlus, HiPlus } from "react-icons/hi";
+import { HiPlus } from "react-icons/hi";
 import { CreateButton } from "../sidebar/CreateButton";
 
 const slotProps: TimeClockSlotProps = {

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { createContext, useContext, useState, ReactNode } from "react";
 import type { Task } from "~/server/db/schema";
 
@@ -23,7 +23,17 @@ interface TaskContextType {
   setCompletedData: (tasks: Task[]) => void;
   setNumCompleted: (count: number) => void;
   setNumOngoing: (count: number) => void;
+  handleFormValue: (
+    title: string,
+    description: string,
+    date: Date,
+    taskId: number,
+  ) => void;
+  setUndefined: () => void;
+  handleUpdateData: (newTask: Task[]) => void;
+  handleEditData: (newTask: Task) => void;
 }
+
 
 // Create the context with default values
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -40,7 +50,32 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const [completedData, setCompletedData] = useState<Task[]>();
   const [numCompleted, setNumCompleted] = useState<number | undefined>();
   const [numOngoing, setNumOngoing] = useState<number | undefined>();
-  
+  const handleFormValue = (
+    title: string,
+    description: string,
+    date: Date,
+    taskId: number,
+  ) => {
+    setIsOpenDialog(true);
+    setTitle(title);
+    setDescription(description);
+    setDate(date);
+    setTaskId(taskId);
+  };
+  const setUndefined = () => {
+    setTitle(undefined);
+    setDescription(undefined);
+    setDate(undefined);
+    setTaskId(undefined);
+  };
+
+  const handleUpdateData = (newTask: Task[]) => {
+    setUpdatedData(newTask);
+  };
+
+  const handleEditData = (newTask: Task) => {
+    setEditedData(newTask);
+  };
 
   return (
     <TaskContext.Provider
@@ -65,6 +100,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         setCompletedData,
         setNumCompleted,
         setNumOngoing,
+        handleFormValue,
+        setUndefined,
+        handleUpdateData,
+        handleEditData,
       }}
     >
       {children}

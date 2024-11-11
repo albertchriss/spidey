@@ -25,19 +25,6 @@ export const CreateTab = ({userId}: CreateTabProps) => {
 
       } = useTaskContext();
     
-      const handleFormValue = (
-        title: string,
-        description: string,
-        date: Date,
-        taskId: number,
-      ) => {
-        setIsOpenDialog(true);
-        setTitle(title);
-        setDescription(description);
-        setDate(date);
-        setTaskId(taskId);
-      };
-    
       const setUndefined = () => {
         setTitle(undefined);
         setDescription(undefined);
