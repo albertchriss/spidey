@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "../_components/sidebar/Sidebar";
 import { TaskProvider } from "../_components/tasklist/TaskContext";
+import { Toaster } from "~/components/ui/toaster";
 
 export default async function Layout({
   children,
@@ -21,9 +22,8 @@ export default async function Layout({
       <SidebarProvider>
         <TaskProvider>
           <AppSidebar src={imgsrc ?? ""} email={email ?? ""} userId={userId ?? ""}/>
-          {/* <Navbar src={imgsrc ?? "/default-pp.svg"} email={email ?? ""} /> */}
           {children}
-
+          <Toaster />
         </TaskProvider>
       </SidebarProvider>
     </main>

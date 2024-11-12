@@ -1,5 +1,5 @@
 "use client";
-
+import { ThreeDots } from "react-loader-spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +28,7 @@ import type { Task } from "~/server/db/schema";
 import { HiPlus } from "react-icons/hi";
 import { CreateButton } from "./CreateButton";
 import { useTaskContext } from "../tasklist/TaskContext";
+import { useToast } from "~/hooks/use-toast";
 
 const slotProps: TimeClockSlotProps = {
   leftArrowIcon: { fontSize: "large" },
@@ -51,6 +52,7 @@ interface CreateTaskPopUpProps {
 }
 
 export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
+  const { toast } = useToast();
   // state
   const {
     title,
@@ -59,11 +61,11 @@ export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
     taskId,
     handleUpdateData,
     handleEditData,
+    handleFailedData,
     setIsOpenDialog,
     setUndefined,
   } = useTaskContext();
   const [isCreate, setIsCreate] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
     date ? dayjs(date) : null,
   );
@@ -72,24 +74,59 @@ export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
   );
 
   // mutation functions
+  const [currentInput, setCurrentInput] = useState<Task | undefined>(undefined);
   const { mutate: createTask } = api.task.createTask.useMutation({
     onMutate: (data) => {
+      setCurrentInput(data as Task);
       handleUpdateData([data as Task]);
     },
     onSuccess: (data) => {
       if (data) {
         handleEditData(data);
       }
+      toast({
+        title: "Task created",
+        description: `Task deadline: ${dayjs(data?.deadline).format("DD/MM/YYYY HH:mm")}`,
+        style: { backgroundColor: "#86efac" },
+      });
       setUndefined();
+      setCurrentInput(undefined);
     },
-    // onError ntar atur
+    onError: () => {
+      handleFailedData(currentInput!);
+      toast({
+        title: "Failed to create task",
+        description: `Please try again later`,
+        style: { backgroundColor: "#fca5a5" },
+      });
+      setCurrentInput(undefined);
+    },
   });
+
+  const [isPending, setIsPending] = useState(false);
   const { mutate: updateTask } = api.task.updateTask.useMutation({
-    onMutate: (data) => {
-      handleEditData(data as Task);
+    onMutate: () => {
+      setIsPending(true);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      handleEditData(data as Task);
+      toast({
+        title: "Task updated",
+        description: `Task successfully updated`,
+        style: { backgroundColor: "#86efac" },
+      });
       setUndefined();
+      setIsOpenDialog(false);
+      setIsPending(false);
+    },
+    onError: () => {
+      toast({
+        title: "Failed to update task",
+        description: `Please try again later`,
+        style: { backgroundColor: "#fca5a5" },
+      });
+      setIsOpenDialog(false);
+      setIsPending(false);
     },
   });
 
@@ -122,15 +159,12 @@ export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
   // functions
   const onSubmit = (data: z.infer<typeof TaskSchema>) => {
     if (!taskId) {
-      startTransition(() => {
-        createTask({ ...data, userId });
-      });
+      createTask({ ...data, userId });
+      setIsOpenDialog(false);
     } else {
-      startTransition(() => {
-        updateTask({ ...data, id: taskId });
-      });
+      updateTask({ ...data, id: taskId });
     }
-    setIsOpenDialog(false);
+
     form.reset();
     setSelectedDate(null);
     setInputValue("");
@@ -190,10 +224,10 @@ export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
       <CreateButton
         title={`${taskId ? "Edit" : "Create"} a task`}
         trigger={
-          <span className="flex h-full items-center gap-3">
-            Create Task
-            <HiPlus className="inline-block text-lg font-bold" />
-          </span>
+            <span className="flex h-full items-center gap-3">
+              Create Task
+              <HiPlus className="inline-block text-lg font-bold" />
+            </span>
         }
         description="Define the task title, description (optional), and deadline"
         setIsCreate={setIsCreate}
@@ -278,7 +312,12 @@ export const CreateTab = ({ userId }: CreateTaskPopUpProps) => {
               </div>
             </div>
             <Button type="submit" disabled={isPending} className="w-full">
-              Save Changes
+              {
+              isPending ?
+              <ThreeDots color="white" height="8"/>
+              :
+              "Save Changes"
+              }
             </Button>
           </form>
         </Form>

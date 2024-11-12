@@ -19,3 +19,5 @@ npm install @mui/material @emotion/react @emotion/styled
 npm install @mui/x-date-pickers
 
 npm install dayjs
+
+npm install react-loader-spinner --save

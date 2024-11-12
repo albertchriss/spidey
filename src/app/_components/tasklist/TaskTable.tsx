@@ -23,8 +23,10 @@ export const TaskTable = ({ userId, isCompleted }: TaskTableProps) => {
     updatedData,
     completedData,
     editedData,
+    failedData,
     setUpdatedData,
     setEditedData,
+    setFailedData,
     setCompletedData,
     setNumOngoing,
     setNumCompleted,
@@ -142,6 +144,23 @@ export const TaskTable = ({ userId, isCompleted }: TaskTableProps) => {
       [...prev].sort((a, b) => a.deadline.getTime() - b.deadline.getTime()),
     );
   }, [query, updatedData, editedData, completedData]);
+
+  useEffect(() => {
+    if (failedData) {
+      setData((prev) =>
+        prev.filter(
+          (task) =>
+            !(task.id === failedData.id ||
+            (!task.id &&
+              task.title === failedData.title &&
+              task.description === failedData.description &&
+              task.deadline.toISOString() ===
+                failedData.deadline.toISOString())),
+        ),
+      );
+      setFailedData(undefined);
+    }
+  }, [failedData]);
 
   // functions
   const handleSelectAll = () => {
